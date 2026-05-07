@@ -22,6 +22,8 @@ public class Servidor {
             Thread jogo = new Thread(new BatalhaNaval(clienteA, clienteB));
             jogo.start();
 
+            clienteA.close();
+            clienteB.close();
 
         } catch(IOException e){}
 
