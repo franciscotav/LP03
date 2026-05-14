@@ -64,29 +64,30 @@ public class Tabuleiro {
         //faz as contas consuante a orientação
         switch(orientacao){
             case NORTE:
-                posicaoFinal = posicao.getY() - barco.getComprimento()-1;
+                posicaoFinal = posicao.getY() - (barco.getComprimento()-1);
                 if(posicaoFinal>=0){
                     valido=true;
                 }
                 break;
             case ESTE:
-                posicaoFinal = posicao.getX() + barco.getComprimento()-1;
+                posicaoFinal = posicao.getX() + (barco.getComprimento()-1);
                 if(posicaoFinal<10){
                     valido=true;
                 }
                 break;
             case SUL:
-                posicaoFinal = posicao.getY() + barco.getComprimento()-1;
+                posicaoFinal = posicao.getY() + (barco.getComprimento()-1);
                 if(posicaoFinal<10){
                     valido=true;
                 }
                 break;
             case OESTE:
-                posicaoFinal = posicao.getX() - barco.getComprimento()-1;
-                if(posicaoFinal<=0){
+                posicaoFinal = posicao.getX() - (barco.getComprimento()-1);
+                if(posicaoFinal>=0){
                     valido=true;
                 }
                 break;
+
         }
 
         return valido;
@@ -115,11 +116,14 @@ public class Tabuleiro {
                 case OESTE:
                     posicaoAtual= new Posicao(x-i, y);
                     break;
+                //para o compilador não chatear
+                default:
+                    posicaoAtual = new Posicao(0, 0);
             }
 
-            boolean validacao = verificaVizinho(posicao);
+            boolean validacao = verificaVizinho(posicaoAtual);
 
-            if(validacao==false){
+            if(!validacao){
                 return false;
             }
         }
@@ -146,5 +150,15 @@ public class Tabuleiro {
         }
 
         return valido;
+    }
+
+    //para testar
+    public void imprime(){
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                System.out.print(celulas[i][j].ordinal() + " ");;
+            }
+            System.out.println();
+        }
     }
 }

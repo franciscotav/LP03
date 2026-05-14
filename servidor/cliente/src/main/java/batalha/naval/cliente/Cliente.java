@@ -3,6 +3,7 @@ package batalha.naval.cliente;
 import java.io.IOException;
 import java.net.*;
 
+
 public class Cliente {
     private Socket socket;
 
