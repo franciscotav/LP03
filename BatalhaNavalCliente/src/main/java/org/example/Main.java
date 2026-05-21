@@ -7,7 +7,7 @@ import library.payload.tabuleiro.*;
 
 public class Main {
     static void main() {
-        //Cliente cliente = new Cliente("localhost", 8080);
+        Cliente cliente = new Cliente("localhost", 8080);
 
         Tabuleiro tabuleiro = new Tabuleiro();
         BarcoBote barco = new BarcoBote();
