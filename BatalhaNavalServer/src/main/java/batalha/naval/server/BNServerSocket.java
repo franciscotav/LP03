@@ -3,15 +3,15 @@ package batalha.naval.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.LinkedList;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class BNServerSocket extends ServerSocket implements Runnable{
-    private LinkedList<Socket> clients;
+    private LinkedBlockingDeque<Socket> clients;
 
     public BNServerSocket(int porta) throws IOException{
         super(porta);
-        clients = new LinkedList<>();
-
+        clients = new LinkedBlockingDeque<>();
+        System.out.println("Servidor: " + super.toString());
     }
 
     public void run(){
@@ -21,17 +21,19 @@ public class BNServerSocket extends ServerSocket implements Runnable{
     private void listening(){
         while(true){
             try{
-                Socket cliente = super.accept();
-                clients.add(cliente);
-                System.out.println("Cliente: " + cliente.getLocalAddress() + ":" + cliente.getLocalPort());
+                Socket jogadorSocket = super.accept();
+                clients.put(jogadorSocket);
+                System.out.println("Nova Ligacao: " + jogadorSocket.toString());
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
     }
 
-    public LinkedList<Socket> clients(){
+    public LinkedBlockingDeque<Socket> clients(){
         return clients;
     }
 }

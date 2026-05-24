@@ -1,31 +1,37 @@
 package batalha.naval.server;
 
 public class BNJogo implements Runnable{
+    private String jogoID;
     private BNJogador jogadorA;
     private BNJogador jogadorB;
 
-    public BNJogo(BNJogador bnJogador){
+    public BNJogo(BNJogador bnJogador, String jogoID){
         this.jogadorA = bnJogador;
         this.jogadorB = null;
+
+        this.jogoID = jogoID;
     }
 
-    public boolean esperaJogador(){
-        if(jogadorB == null)
+    public synchronized boolean esperaJogador(){
+        if(jogadorA == null || jogadorB == null)
             return true;
 
         return false;
     }
 
-    public void addJogador(BNJogador bnJogador){
-        jogadorB = bnJogador;
+    public synchronized void addJogador(BNJogador bnJogador){
+        if(jogadorA == null)
+            jogadorA = bnJogador;
+        else
+            jogadorB = bnJogador;
     }
 
     public void run() {
         while(true){
-            if(jogadorB != null)
+            //if(jogadorB != null)
         }
     }
 
-    public void removerJogador(){
+    public synchronized void removerJogador(){
     }
 }

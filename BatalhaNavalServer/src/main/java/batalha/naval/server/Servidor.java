@@ -2,47 +2,44 @@ package batalha.naval.server;
 
 import java.io.*;
 import java.net.*;
-import java.util.LinkedList;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class Servidor{
-    private LinkedList<BNJogo> bnJogos;
+    private static int numeroJogos;
+    private LinkedBlockingDeque<BNJogo> bnJogos;
     private BNServerSocket bnServerSocket;
-    private SalaEspera salaEspera;
 
     public Servidor(int porta){
         try{
-            bnJogos = new LinkedList<>();
+            numeroJogos = 0;
+            bnJogos = new LinkedBlockingDeque<>();
+
             bnServerSocket = new BNServerSocket(porta);
-            salaEspera = new SalaEspera();
-            System.out.println("ServerSocket na porta: " + porta);
+            Thread listeningThread = new Thread(bnServerSocket);
+            listeningThread.start();
 
         }catch(IOException e){
             e.printStackTrace();
         }
     }
 
-    public void init(){
-        Thread listeningThread = new Thread(bnServerSocket);
-        listeningThread.start();
-
-        SalaEspera salaEspera = new SalaEspera();
-        Thread salaThread = new Thread(salaEspera);
-        salaThread.start();
-
+    public void run(){
         while(true){
-            if(!bnServerSocket.clients().isEmpty()){
-                Socket socket = bnServerSocket.clients().removeFirst();
-
+            try{
+                Socket socket = bnServerSocket.clients().take();
                 BNJogador bnJogador = new BNJogador(socket, this);
+
                 Thread jogadorThread = new Thread(bnJogador);
                 jogadorThread.start();
 
-                salaEspera.addJogador(bnJogador);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                break;
             }
         }
     }
 
-    public LinkedList<BNJogo> getBNJogos(){
+    public LinkedBlockingDeque<BNJogo> getBNJogos(){
         return bnJogos;
     }
 
@@ -58,5 +55,9 @@ public class Servidor{
         }
 
         return null;
+    }
+
+    public synchronized String criarJogoID(){
+        return "JOGO%d".formatted(numeroJogos);
     }
 }

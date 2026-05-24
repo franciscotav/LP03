@@ -1,11 +1,9 @@
 package batalha.naval.server;
 
 import library.payload.comunicacao.*;
-import library.payload.tabuleiro.EstadosTabuleiro;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class BNJogador implements Runnable {
@@ -25,12 +23,9 @@ public class BNJogador implements Runnable {
 
     public void readInput(){
         try{
-            //ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
             EstadosMenu estadosMenu = (EstadosMenu) objectInputStream.readObject();
-            opcoes(estadosMenu);
-
-
+            opcoesIniciais(estadosMenu);
 
         }catch(IOException e){
             e.printStackTrace();
@@ -40,19 +35,17 @@ public class BNJogador implements Runnable {
 
     }
 
-    private void opcoes(EstadosMenu estado){
+    private void opcoesIniciais(EstadosMenu estado){
         switch(estado){
             case NOVO_JOGO:
                 BNJogo bnJogoDisponivel = servidor.getBNJogoDisponivel();
 
                 if(bnJogoDisponivel == null){
-                    BNJogo bnJogo = new BNJogo(this);
-                    Thread jogoThread = new Thread(bnJogo);
-                    jogoThread.start();
-
-                    servidor.addBNJogo(bnJogo);
+                    criarNovoJogo();
+                    System.out.println("Novo Jogo criado");
                 }else{
                     bnJogoDisponivel.addJogador(this);
+                    System.out.println("Jogador adicionado a Jogo");
                 }
 
                 break;
@@ -60,7 +53,18 @@ public class BNJogador implements Runnable {
                 break;
             case QUIT:
                 break;
+            default:
 
         }
+    }
+
+    private void criarNovoJogo(){
+        BNJogo bnJogo = new BNJogo(this, servidor.criarJogoID());
+        servidor.addBNJogo(bnJogo);
+
+        Thread jogoThread = new Thread(bnJogo);
+        jogoThread.start();
+
+        System.out.println("New Game");
     }
 }
