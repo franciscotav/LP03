@@ -5,6 +5,7 @@ import java.awt.event.MouseListener;
 
 public class Window extends JFrame {
     private Menu menu;
+    private AreaJogo areaJogo;
 
     public Window(){
         super("Batalha Naval by David e Francisco");
@@ -12,10 +13,7 @@ public class Window extends JFrame {
         setSize(900, 1100);
 
         menu = new Menu();
-        //add(menu);
-        //setLayout(null);
-        AreaJogo areaJogo = new AreaJogo();
-        add(areaJogo);
+        add(menu);
 
         setVisible(true);
     }
@@ -35,5 +33,34 @@ public class Window extends JFrame {
     public void windowUpdate(){
         revalidate();
         repaint();
+    }
+
+    public void hideMenu(){
+        remove(menu);
+        windowUpdate();
+    }
+
+    public void showMenu(){
+        add(menu);
+        windowUpdate();
+    }
+
+    public void hideAreaJogo(){
+        remove(areaJogo);
+        windowUpdate();
+    }
+
+    public void showAreaJogo(){
+        add(areaJogo);
+        windowUpdate();
+    }
+
+    public void setAreaJogo(AreaJogo areaJogo){
+        this.areaJogo = areaJogo;
+    }
+
+    public void appendLog(String log){
+        areaJogo.appendLog(log);
+        windowUpdate();
     }
 }

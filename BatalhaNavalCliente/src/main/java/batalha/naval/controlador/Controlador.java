@@ -1,6 +1,7 @@
 package batalha.naval.controlador;
 
 import batalha.naval.cliente.Cliente;
+import batalha.naval.swing.AreaJogo;
 import batalha.naval.swing.Window;
 import library.payload.comunicacao.EstadosMenu;
 
@@ -34,6 +35,16 @@ public class Controlador {
             cliente = new Cliente(host,port);
 
             cliente.sendInput(EstadosMenu.NOVO_JOGO);
+
+            window.hideMenu();
+
+            AreaJogo areaJogo = new AreaJogo();
+            window.setAreaJogo(areaJogo);
+            window.showAreaJogo();
+
+            LogicaJogo logicaJogo = new LogicaJogo(window,cliente);
+            Thread logicaJogothread = new Thread(logicaJogo);
+            logicaJogothread.start();
         }
 
         @Override

@@ -35,6 +35,10 @@ public class AreaJogo extends JPanel{
             add(areaLogs,c);
     }
 
+    public void appendLog(String log){
+        areaLogs.appendLog(log);
+    }
+
 }
 
 class AreaMenu extends JPanel{
@@ -87,6 +91,10 @@ class AreaLogs extends JScrollPane{
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    }
+
+    public void appendLog(String log){
+        logAreaTexto.append(log + "\n");
     }
 }
 

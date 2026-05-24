@@ -4,32 +4,58 @@ import library.payload.comunicacao.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class BNJogador implements Runnable {
     private Servidor servidor;
     private Socket socket;
+    boolean update;
+
+    ObjectInputStream objectInputStream;
+    ObjectOutputStream objectOutputStream;
 
     public BNJogador(Socket socket, Servidor servidor) {
         this.socket = socket;
         this.servidor = servidor;
+
+        try {
+            objectInputStream = new ObjectInputStream(socket.getInputStream());
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
     }
 
     public void run(){
         while(true){
+            writeInput(Validacao.OK);
             readInput();
         }
     }
 
     public void readInput(){
         try{
-            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-            EstadosMenu estadosMenu = (EstadosMenu) objectInputStream.readObject();
-            opcoesIniciais(estadosMenu);
+            Object input = objectInputStream.readObject();
 
-        }catch(IOException e){
+            if(input instanceof EstadosMenu){
+                opcoesIniciais((EstadosMenu) input);
+            }
+
+        } catch (IOException e) {
             e.printStackTrace();
-        }catch(Exception e){
+        }
+        catch(ClassNotFoundException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void writeInput(Validacao validacao){
+        try{
+            objectOutputStream.writeObject(validacao);
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
