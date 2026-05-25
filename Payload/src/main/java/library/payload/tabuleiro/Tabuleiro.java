@@ -16,6 +16,14 @@ public class Tabuleiro {
         }
     }
 
+    public void setEstadosTabuleiro(int i, int j, EstadosTabuleiro estadosTabuleiro){
+        celulas[i][j] = estadosTabuleiro;
+    }
+
+    public EstadosTabuleiro getEstadosTabuleiro(int i, int j){
+        return celulas[i][j];
+    }
+
     public boolean adicionarBarco(Barco barco, Posicao posicao, Orientacao orientacao){
         //se todos os requisitos para colocar o barco forem válidos!
         if(!(this.verificaLimites(barco, posicao, orientacao) && this.verificaProximidade(barco, posicao, orientacao))){
@@ -56,41 +64,28 @@ public class Tabuleiro {
     }
 
     //verifica se está dentro dos limites do tabuleiro
-    private boolean verificaLimites(Barco barco, Posicao posicao, Orientacao orientacao){
-        boolean valido = false;
-
-        int posicaoFinal;
-
-        //faz as contas consuante a orientação
-        switch(orientacao){
-            case NORTE:
-                posicaoFinal = posicao.getY() - (barco.getComprimento()-1);
-                if(posicaoFinal>=0){
-                    valido=true;
-                }
-                break;
-            case ESTE:
-                posicaoFinal = posicao.getX() + (barco.getComprimento()-1);
-                if(posicaoFinal<10){
-                    valido=true;
-                }
-                break;
-            case SUL:
-                posicaoFinal = posicao.getY() + (barco.getComprimento()-1);
-                if(posicaoFinal<10){
-                    valido=true;
-                }
-                break;
-            case OESTE:
-                posicaoFinal = posicao.getX() - (barco.getComprimento()-1);
-                if(posicaoFinal>=0){
-                    valido=true;
-                }
-                break;
-
+    public boolean verificaLimites(Barco barco, Posicao posicao, Orientacao orientacao){
+        if (posicao.getX() < 0 || posicao.getX() >= 10 || posicao.getY() < 0 || posicao.getY() >= 10) {
+            return false;
         }
 
-        return valido;
+        int posicaoFinal;
+        switch(orientacao){
+            case NORTE:
+                posicaoFinal = posicao.getY() - (barco.getComprimento() - 1);
+                return posicaoFinal >= 0;
+            case ESTE:
+                posicaoFinal = posicao.getX() + (barco.getComprimento() - 1);
+                return posicaoFinal < 10;
+            case SUL:
+                posicaoFinal = posicao.getY() + (barco.getComprimento() - 1);
+                return posicaoFinal < 10;
+            case OESTE:
+                posicaoFinal = posicao.getX() - (barco.getComprimento() - 1);
+                return posicaoFinal >= 0;
+            default:
+                return false;
+        }
     }
 
     //verifica se tem algum barco perto á volta

@@ -6,6 +6,8 @@ import batalha.naval.swing.Window;
 import library.payload.comunicacao.EstadosMenu;
 
 import javax.swing.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -25,7 +27,7 @@ public class Controlador {
         window.setNovoJogoButton(new NovoJogoMouseAdapter());
     }
 
-    class NovoJogoMouseAdapter implements MouseListener {
+    private class NovoJogoMouseAdapter implements MouseListener {
         @Override
         public void mouseClicked(MouseEvent e) {
             if(!enterServerInformation()) return;
@@ -41,6 +43,7 @@ public class Controlador {
             AreaJogo areaJogo = new AreaJogo();
             window.setAreaJogo(areaJogo);
             window.showAreaJogo();
+            window.addKeyListener(new Controlador.JogoKeyAdapter());
 
             LogicaJogo logicaJogo = new LogicaJogo(window,cliente);
             Thread logicaJogothread = new Thread(logicaJogo);
@@ -83,6 +86,41 @@ public class Controlador {
         }
 
         return false;
+    }
+
+    private class JogoKeyAdapter extends KeyAdapter {
+        public void keyPressed(KeyEvent e){
+            int keyCode = e.getKeyCode();
+
+            if(keyCode == KeyEvent.VK_UP){
+                window.moveUp();
+                //window.appendLog("Pressed UP");
+            }
+
+            if(keyCode == KeyEvent.VK_LEFT){
+                window.moveLeft();
+                //window.appendLog("Pressed LEFT");
+            }
+
+            if(keyCode == KeyEvent.VK_RIGHT){
+                window.moveRight();
+                //window.appendLog("Pressed RIGHT");
+            }
+
+            if(keyCode == KeyEvent.VK_DOWN){
+                window.moveDown();
+                //window.appendLog("Pressed DOWN");
+            }
+
+            if(keyCode == KeyEvent.VK_SHIFT){
+                window.rodarBarco();
+            }
+
+            if(keyCode == KeyEvent.VK_ENTER){
+                window.setBarco();
+            }
+
+        }
     }
 }
 

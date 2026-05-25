@@ -9,6 +9,8 @@ public class BNJogo implements Runnable{
     private BNJogador jogadorA;
     private BNJogador jogadorB;
     private boolean running;
+    private boolean jogadorAturno;
+    private boolean jogadorBturno;
 
     public BNJogo(BNJogador bnJogador, String jogoID){
         this.jogadorA = bnJogador;
@@ -16,6 +18,9 @@ public class BNJogo implements Runnable{
 
         this.jogoID = jogoID;
         this.running = false;
+
+        this.jogadorAturno = false;
+        this.jogadorBturno = false;
 
         System.out.println("A criar jogo JogoID: " + jogoID);
     }
@@ -42,12 +47,31 @@ public class BNJogo implements Runnable{
     }
 
     public void run() {
-        Random random = new Random();
-        boolean jogadorATurno = random.nextBoolean();
+        aleatorioJogador();
         running = true;
         while(running){
+            if(condicaoesJogo()){
 
+            }
         }
+    }
+
+    private void aleatorioJogador(){
+        Random random = new Random();
+        if(random.nextBoolean()){
+            jogadorAturno = true;
+            jogadorBturno = false;
+        }else{
+            jogadorAturno = false;
+            jogadorBturno = true;
+        }
+    }
+
+    public boolean condicaoesJogo(){
+        if(jogadorA == null || jogadorB == null)
+            return false;
+
+        return true;
     }
 
     public synchronized void removerJogador(BNJogador bnJogador){

@@ -15,6 +15,9 @@ public class Window extends JFrame {
         menu = new Menu();
         add(menu);
 
+        setFocusable(true);
+        requestFocusInWindow();
+
         setVisible(true);
     }
 
@@ -57,6 +60,30 @@ public class Window extends JFrame {
 
     public void setAreaJogo(AreaJogo areaJogo){
         this.areaJogo = areaJogo;
+    }
+
+    public void moveUp(){
+        areaJogo.moveUp();
+    }
+
+    public void moveDown(){
+        areaJogo.moveDown();
+    }
+
+    public void moveLeft(){
+        areaJogo.moveLeft();
+    }
+
+    public void moveRight(){
+        areaJogo.moveRight();
+    }
+
+    public void setBarco(){
+        areaJogo.setBarco();
+    }
+
+    public void rodarBarco(){
+        areaJogo.rodarBarco();
     }
 
     public void appendLog(String log){
