@@ -151,8 +151,8 @@ public class Tabuleiro implements Serializable {
 
     //para testar
     public void imprime(){
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
+        for (int j = 0; j < 10; j++) {
+            for (int i = 0; i < 10; i++) {
                 System.out.print(celulas[i][j].ordinal() + " ");;
             }
             System.out.println();
