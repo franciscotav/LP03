@@ -2,7 +2,9 @@ package library.payload.tabuleiro;
 
 import library.payload.barco.*;
 
-public class Tabuleiro {
+import java.io.Serializable;
+
+public class Tabuleiro implements Serializable {
     private EstadosTabuleiro[][] celulas;
 
     public Tabuleiro(){

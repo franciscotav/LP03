@@ -24,9 +24,9 @@ public class Cliente {
         }
     }
 
-    public void sendInput(EstadosMenu estadosMenu){
+    public void sendInput(Object input){
         try{
-            objectOuputStream.writeObject(estadosMenu);
+            objectOuputStream.writeObject(input);
         }catch (IOException e) {
             e.printStackTrace();
         }

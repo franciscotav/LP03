@@ -1,6 +1,7 @@
 package batalha.naval.server;
 
 import library.payload.comunicacao.*;
+import library.payload.tabuleiro.Tabuleiro;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -53,6 +54,12 @@ public class BNJogador implements Runnable {
             if(input instanceof EstadosMenu){
                 opcoesIniciais((EstadosMenu) input);
                 return Validacao.WAITING_INPUT;
+            }
+
+            if(input instanceof Tabuleiro){
+                Tabuleiro tabuleiroBarcos = (Tabuleiro) input;
+                bnJogo.addTabuleiro(this, tabuleiroBarcos);
+                return Validacao.OK;
             }
 
         }catch(SocketException e){

@@ -3,13 +3,18 @@ package batalha.naval.swing;
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.awt.event.KeyListener;
 
+import batalha.naval.cliente.Cliente;
 import library.payload.barco.*;
 import library.payload.tabuleiro.EstadosTabuleiro;
 import library.payload.tabuleiro.Posicao;
 import library.payload.tabuleiro.Tabuleiro;
 
 public class AreaJogo extends JPanel{
+    private Window window;
+    private Cliente cliente;
+
     private AreaMenu areaMenu;
     private AreaJogador areaJogador;
     private AreaInimigo areaInimigo;
@@ -20,7 +25,10 @@ public class AreaJogo extends JPanel{
     private Barco barcoSetup;
     private Orientacao orientacaoSetup;
 
-    public AreaJogo(){
+    public AreaJogo(Window window, Cliente cliente){
+            this.window = window;
+            this.cliente = cliente;
+
             setLayout(new GridBagLayout());
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = 0;
@@ -56,7 +64,7 @@ public class AreaJogo extends JPanel{
         areaLogs.appendLog(log);
     }
 
-    private void doSetup(){
+    private void proximoBarcoSetup(){
         xPosicaoSetup = 4;
         yPosicaoSetup = 4;
         orientacaoSetup = Orientacao.SUL;
@@ -117,11 +125,19 @@ public class AreaJogo extends JPanel{
             return;
         }
 
-        doSetup();
+        proximoBarcoSetup();
         areaJogador.updateViewFromTabuleiro();
 
         if(areaJogadorSetup){
             areaJogador.moveBarco(xPosicaoSetup,yPosicaoSetup,barcoSetup,orientacaoSetup);
+        }else{
+            KeyListener[] keyListeners = window.getKeyListeners();
+            for(KeyListener keyListener : keyListeners){
+                window.removeKeyListener(keyListener);
+            }
+
+            cliente.sendInput(areaJogador.tabuleiroJogador);
+            areaLogs.appendLog("Enviou barcos para servidor");
         }
 
     }

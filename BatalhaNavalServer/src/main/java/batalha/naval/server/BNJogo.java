@@ -1,14 +1,23 @@
 package batalha.naval.server;
 
 import library.payload.comunicacao.EstadosJogo;
+import library.payload.tabuleiro.Tabuleiro;
 
 import java.util.Random;
 
 public class BNJogo implements Runnable{
     private String jogoID;
+
     private BNJogador jogadorA;
     private BNJogador jogadorB;
+
+    private Tabuleiro jogadorATabuleiroBarcos;
+    private Tabuleiro jogadorATabuleiroTiros;
+    private Tabuleiro jogadorBTabuleiroBarcos;
+    private Tabuleiro jogadorBTabuleiroTiros;
+
     private boolean running;
+
     private boolean jogadorAturno;
     private boolean jogadorBturno;
 
@@ -18,6 +27,11 @@ public class BNJogo implements Runnable{
 
         this.jogoID = jogoID;
         this.running = false;
+
+        this.jogadorATabuleiroBarcos = null;
+        this.jogadorATabuleiroTiros = new Tabuleiro();
+        this.jogadorBTabuleiroBarcos = null;
+        this.jogadorBTabuleiroTiros = new Tabuleiro();
 
         this.jogadorAturno = false;
         this.jogadorBturno = false;
@@ -44,6 +58,18 @@ public class BNJogo implements Runnable{
 
         System.out.println("GameID: " + jogoID + " Addicionar PlayerID: " + bnJogador.getPlayerID());
 
+    }
+
+    public void addTabuleiro(BNJogador bnJogador, Tabuleiro tabuleiroBarcos){
+        if(bnJogador == jogadorA){
+            jogadorATabuleiroBarcos = tabuleiroBarcos;
+            jogadorATabuleiroBarcos.imprime();
+        }
+
+        if(bnJogador == jogadorB){
+            jogadorBTabuleiroBarcos = tabuleiroBarcos;
+            jogadorBTabuleiroBarcos.imprime();
+        }
     }
 
     public void run() {

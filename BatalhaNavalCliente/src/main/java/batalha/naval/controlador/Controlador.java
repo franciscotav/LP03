@@ -40,7 +40,7 @@ public class Controlador {
 
             window.hideMenu();
 
-            AreaJogo areaJogo = new AreaJogo();
+            AreaJogo areaJogo = new AreaJogo(window,cliente);
             window.setAreaJogo(areaJogo);
             window.showAreaJogo();
             window.addKeyListener(new Controlador.JogoKeyAdapter());
