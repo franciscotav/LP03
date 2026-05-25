@@ -1,6 +1,7 @@
 package batalha.naval.server;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -11,7 +12,10 @@ public class BNServerSocket extends ServerSocket implements Runnable{
     public BNServerSocket(int porta) throws IOException{
         super(porta);
         clients = new LinkedBlockingDeque<>();
-        System.out.println("Servidor: " + super.toString());
+
+        InetAddress remoteAddress = super.getInetAddress();
+        String remoteIp = remoteAddress.getHostAddress();
+        System.out.println("Servidor: " + remoteIp + ":" + porta);
     }
 
     public void run(){
@@ -23,7 +27,12 @@ public class BNServerSocket extends ServerSocket implements Runnable{
             try{
                 Socket jogadorSocket = super.accept();
                 clients.put(jogadorSocket);
-                System.out.println("Nova Ligacao: " + jogadorSocket.toString());
+
+                InetAddress localAddress = jogadorSocket.getLocalAddress();
+                String localIp = localAddress.getHostAddress();
+                int localPort = jogadorSocket.getLocalPort();
+
+                System.out.println("Nova Ligacao: " + localIp + ":" + localPort);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {

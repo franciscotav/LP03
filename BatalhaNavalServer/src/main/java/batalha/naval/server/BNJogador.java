@@ -6,18 +6,24 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class BNJogador implements Runnable {
-    private Servidor servidor;
     private Socket socket;
-    boolean update;
+    private Servidor servidor;
+    private String playerId;
+    private boolean running;
+    private BNJogo bnJogo;
 
     ObjectInputStream objectInputStream;
     ObjectOutputStream objectOutputStream;
 
-    public BNJogador(Socket socket, Servidor servidor) {
+    public BNJogador(Socket socket, Servidor servidor, String playerID) {
         this.socket = socket;
         this.servidor = servidor;
+        this.playerId = playerID;
+        this.running = false;
+        this.bnJogo = null;
 
         try {
             objectInputStream = new ObjectInputStream(socket.getInputStream());
@@ -26,39 +32,51 @@ public class BNJogador implements Runnable {
             e.printStackTrace();
         }
 
+        System.out.println("A criar jogador PlayerID: " + playerID);
     }
 
     public void run(){
-        while(true){
-            writeInput(Validacao.OK);
-            readInput();
+        running = true;
+        while(running){
+            Object resposta = readInput();
+            if(!running) continue;
+            writeInput(resposta);
         }
+
+        bnJogo.removerJogador(this);
     }
 
-    public void readInput(){
+    public Object readInput(){
         try{
             Object input = objectInputStream.readObject();
 
             if(input instanceof EstadosMenu){
                 opcoesIniciais((EstadosMenu) input);
+                return Validacao.WAITING_INPUT;
             }
 
-        } catch (IOException e) {
+        }catch(SocketException e){
+            System.out.println("Ligação perdida com jogador PlayerID: " + playerId);
+            running = false;
+        }catch (IOException e) {
             e.printStackTrace();
-        }
-        catch(ClassNotFoundException e){
+        }catch(ClassNotFoundException e){
             e.printStackTrace();
         }
 
+        return Validacao.ERROR;
     }
 
-    public void writeInput(Validacao validacao){
+    public void writeInput(Object output){
         try{
-            objectOutputStream.writeObject(validacao);
-        } catch (IOException e) {
+            objectOutputStream.writeObject(output);
+        }catch(SocketException e){
+            System.out.println("Ligação perdida com jogador PlayerID: " + playerId);
+            running = false;
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private void opcoesIniciais(EstadosMenu estado){
@@ -68,10 +86,9 @@ public class BNJogador implements Runnable {
 
                 if(bnJogoDisponivel == null){
                     criarNovoJogo();
-                    System.out.println("Novo Jogo criado");
                 }else{
+                    this.bnJogo = bnJogoDisponivel;
                     bnJogoDisponivel.addJogador(this);
-                    System.out.println("Jogador adicionado a Jogo");
                 }
 
                 break;
@@ -87,10 +104,13 @@ public class BNJogador implements Runnable {
     private void criarNovoJogo(){
         BNJogo bnJogo = new BNJogo(this, servidor.criarJogoID());
         servidor.addBNJogo(bnJogo);
+        this.bnJogo = bnJogo;
 
         Thread jogoThread = new Thread(bnJogo);
         jogoThread.start();
+    }
 
-        System.out.println("New Game");
+    public String getPlayerID(){
+        return playerId;
     }
 }

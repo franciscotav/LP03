@@ -6,12 +6,14 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public class Servidor{
     private static int numeroJogos;
+    private static int numeroJogadores;
     private LinkedBlockingDeque<BNJogo> bnJogos;
     private BNServerSocket bnServerSocket;
 
     public Servidor(int porta){
         try{
             numeroJogos = 0;
+            numeroJogadores = 0;
             bnJogos = new LinkedBlockingDeque<>();
 
             bnServerSocket = new BNServerSocket(porta);
@@ -27,7 +29,7 @@ public class Servidor{
         while(true){
             try{
                 Socket socket = bnServerSocket.clients().take();
-                BNJogador bnJogador = new BNJogador(socket, this);
+                BNJogador bnJogador = new BNJogador(socket, this, criarPlayerID());
 
                 Thread jogadorThread = new Thread(bnJogador);
                 jogadorThread.start();
@@ -58,6 +60,12 @@ public class Servidor{
     }
 
     public synchronized String criarJogoID(){
-        return "JOGO%d".formatted(numeroJogos);
+        numeroJogos++;
+        return "GAME%d".formatted(numeroJogos);
+    }
+
+    public synchronized String criarPlayerID(){
+        numeroJogadores++;
+        return "PLAYER%d".formatted(numeroJogadores);
     }
 }
