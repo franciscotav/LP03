@@ -1,6 +1,9 @@
 package library.payload.tabuleiro;
 
 import library.payload.barco.*;
+import library.payload.comunicacao.EstadosJogo;
+import library.payload.comunicacao.EstadosMenu;
+import library.payload.comunicacao.Validacao;
 
 import java.io.Serializable;
 
@@ -20,6 +23,10 @@ public class Tabuleiro implements Serializable {
 
     public void setEstadosTabuleiro(int i, int j, EstadosTabuleiro estadosTabuleiro){
         celulas[i][j] = estadosTabuleiro;
+    }
+
+    public EstadosTabuleiro getEstadoTabuleiro(int i, int j){
+        return celulas[i][j];
     }
 
     public EstadosTabuleiro getEstadosTabuleiro(int i, int j){
@@ -157,5 +164,13 @@ public class Tabuleiro implements Serializable {
             }
             System.out.println();
         }
+    }
+
+    public boolean verificarTiro(Posicao posicao){
+        if(celulas[posicao.getX()][posicao.getY()] == EstadosTabuleiro.MAR){
+            return true;
+        }
+
+        return false;
     }
 }

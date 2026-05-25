@@ -13,14 +13,13 @@ public class BNServerSocket extends ServerSocket implements Runnable{
         super(porta);
         clients = new LinkedBlockingDeque<>();
 
+        //retorna um objeto InetAddress que contem o IP
         InetAddress remoteAddress = super.getInetAddress();
         String remoteIp = remoteAddress.getHostAddress();
         System.out.println("Servidor: " + remoteIp + ":" + porta);
     }
 
-    public void run(){
-        listening();
-    }
+    public void run(){ listening(); }
 
     private void listening(){
         while(true){

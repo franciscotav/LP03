@@ -4,6 +4,8 @@ import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import batalha.naval.cliente.Cliente;
 import library.payload.barco.*;
@@ -38,7 +40,7 @@ public class AreaJogo extends JPanel{
             areaMenu = new AreaMenu();
             add(areaMenu, c);
             c.gridy = 1;
-            areaInimigo = new AreaInimigo();
+            areaInimigo = new AreaInimigo(cliente);
             add(areaInimigo,c);
             c.gridy = 2;
             c.insets = new Insets(10, 0, 0, 0);
@@ -173,6 +175,7 @@ public class AreaJogo extends JPanel{
                     + "não consgue girar.");
         }
     }
+
 }
 
 class AreaMenu extends JPanel{
@@ -234,9 +237,12 @@ class AreaLogs extends JScrollPane{
 
 class AreaInimigo extends JPanel{
     private Tabuleiro tabuleiroInimigo;
+    private Cliente cliente;
 
-    public AreaInimigo(){
+    public AreaInimigo(Cliente cliente){
         setLayout(new GridLayout(10, 10, 2, 2));
+
+        this.cliente = cliente;
 
         tabuleiroInimigo = new Tabuleiro();
 
@@ -244,6 +250,7 @@ class AreaInimigo extends JPanel{
             for (int i = 0; i < 10; i++) {
                 Color cor = tabuleiroInimigo.getEstadosTabuleiro(i,j).getColor();
                 Casa casa = new Casa(i,j,cor);
+                casa.addCasaMouseAdaptar(new CasaMouseAdaptar(cliente));
                 add(casa);
             }
         }
@@ -339,8 +346,12 @@ class Casa extends JButton{
         setStyle();
     }
 
+    public void addCasaMouseAdaptar(CasaMouseAdaptar casaMouseAdaptar){
+        this.addMouseListener(casaMouseAdaptar);
+    }
+
     private void setStyle(){
-        Dimension dimension = new Dimension(40,40);
+        Dimension dimension = new Dimension(30,30);
         setMinimumSize(dimension);
         setPreferredSize(dimension);
         setMaximumSize(dimension);
@@ -359,11 +370,55 @@ class Casa extends JButton{
         setBackground(cor);
     }
 
+
     public int getI(){
         return i;
     }
 
     public int getJ(){
         return j;
+    }
+
+}
+
+//inner class
+class CasaMouseAdaptar implements MouseListener{
+private Cliente cliente;
+
+    public CasaMouseAdaptar(Cliente cliente){
+        this.cliente=cliente;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        Component component = e.getComponent();
+        if(component instanceof Casa){
+            Casa casa = (Casa) component;
+
+            Posicao posicao = new Posicao(casa.getI(),casa.getJ());
+            cliente.sendInput(posicao);
+
+        }
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 }

@@ -1,6 +1,10 @@
 package batalha.naval.server;
 
 import library.payload.comunicacao.EstadosJogo;
+import library.payload.comunicacao.Mensagem;
+import library.payload.comunicacao.Validacao;
+import library.payload.tabuleiro.EstadosTabuleiro;
+import library.payload.tabuleiro.Posicao;
 import library.payload.tabuleiro.Tabuleiro;
 
 import java.util.Random;
@@ -15,6 +19,8 @@ public class BNJogo implements Runnable{
     private Tabuleiro jogadorATabuleiroTiros;
     private Tabuleiro jogadorBTabuleiroBarcos;
     private Tabuleiro jogadorBTabuleiroTiros;
+
+    private int tiros;
 
     private boolean running;
 
@@ -32,6 +38,8 @@ public class BNJogo implements Runnable{
         this.jogadorATabuleiroTiros = new Tabuleiro();
         this.jogadorBTabuleiroBarcos = null;
         this.jogadorBTabuleiroTiros = new Tabuleiro();
+
+        this.tiros = 3;
 
         this.jogadorAturno = false;
         this.jogadorBturno = false;
@@ -77,9 +85,73 @@ public class BNJogo implements Runnable{
         running = true;
         while(running){
             if(condicaoesJogo()){
+                if(jogadorAturno){
+
+                }else{
+
+                }
 
             }
         }
+    }
+
+    public boolean turno(BNJogador bnJogador){
+        if(jogadorAturno){
+            if(jogadorA == bnJogador)
+                return true;
+        }else{
+            if(jogadorB == bnJogador)
+                return true;
+        }
+        bnJogador.writeInput("Não é o teu turno!");
+        return false;
+    }
+
+    public Mensagem tiroTabuleiro(BNJogador bnJogador, Posicao tiro){
+            if(jogadorA == bnJogador){
+                //verificar que já não tinhamos mandado um tiro lá
+                if(jogadorATabuleiroTiros.verificarTiro(tiro)){
+                    EstadosTabuleiro estadoTabuleiro = jogadorBTabuleiroBarcos.getEstadosTabuleiro(tiro.getX(), tiro.getY());
+
+                    //se acertar num barco
+                    if(estadoTabuleiro!=EstadosTabuleiro.MAR){
+                        jogadorATabuleiroTiros.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ACERTOU);
+                        jogadorBTabuleiroBarcos.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.DANO);
+                        alternarTurno();
+                        return new Mensagem("Acertou");
+                    }else{//se errar
+                        jogadorATabuleiroTiros.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ERROU);
+                        jogadorBTabuleiroBarcos.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ERROU);
+                        alternarTurno();
+                        return new Mensagem("Errou");
+                    }
+                }
+
+                return new Mensagem("Tiro inválido");
+            }
+
+            //igual mas para o B
+        if(jogadorB == bnJogador){
+            //verificar que já não tinhamos mandado um tiro lá
+            if(jogadorBTabuleiroTiros.verificarTiro(tiro)){
+                EstadosTabuleiro estadoTabuleiro = jogadorATabuleiroBarcos.getEstadosTabuleiro(tiro.getX(), tiro.getY());
+
+                //verificar o que está lá
+                if(estadoTabuleiro!=EstadosTabuleiro.MAR){
+                    jogadorBTabuleiroTiros.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ACERTOU);
+                    jogadorATabuleiroBarcos.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.DANO);
+                    alternarTurno();
+                    return new Mensagem("Acertou");
+                }else{
+                    jogadorBTabuleiroTiros.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ERROU);
+                    jogadorATabuleiroBarcos.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ERROU);
+                    alternarTurno();
+                    return new Mensagem("Errou");
+                }
+            }
+        }
+
+        return new Mensagem("Tiro inválido");
     }
 
     private void aleatorioJogador(){
@@ -87,14 +159,30 @@ public class BNJogo implements Runnable{
         if(random.nextBoolean()){
             jogadorAturno = true;
             jogadorBturno = false;
+
         }else{
             jogadorAturno = false;
             jogadorBturno = true;
         }
     }
 
+    private void alternarTurno(){
+        //se não houver tiros troca, se houver tira 1
+        if(tiros==1){
+            jogadorAturno = ( !jogadorAturno );
+            jogadorBturno = ( !jogadorBturno );
+            this.tiros = 3;
+        }else{
+            tiros--;
+        }
+
+    }
+
     public boolean condicaoesJogo(){
         if(jogadorA == null || jogadorB == null)
+            return false;
+
+        if(jogadorATabuleiroBarcos == null || jogadorBTabuleiroBarcos == null)
             return false;
 
         return true;

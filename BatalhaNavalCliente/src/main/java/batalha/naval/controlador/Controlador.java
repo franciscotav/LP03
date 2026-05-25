@@ -34,7 +34,7 @@ public class Controlador {
 
             String host = defaultIP.split(":")[0];
             int port = Integer.parseInt(defaultIP.split(":")[1]);
-            cliente = new Cliente(host,port);
+            cliente = new Cliente(host,port, window);
 
             cliente.sendInput(EstadosMenu.NOVO_JOGO);
 

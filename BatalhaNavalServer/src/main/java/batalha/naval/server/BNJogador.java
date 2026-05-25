@@ -1,6 +1,7 @@
 package batalha.naval.server;
 
 import library.payload.comunicacao.*;
+import library.payload.tabuleiro.Posicao;
 import library.payload.tabuleiro.Tabuleiro;
 
 import java.io.IOException;
@@ -40,12 +41,16 @@ public class BNJogador implements Runnable {
         running = true;
         while(running){
             Object resposta = readInput();
-            if(!running) continue;
+
+            //caso o cliente dé desconect
+            if(!running) break;
+
             writeInput(resposta);
         }
 
         bnJogo.removerJogador(this);
     }
+
 
     public Object readInput(){
         try{
@@ -55,6 +60,19 @@ public class BNJogador implements Runnable {
                 opcoesIniciais((EstadosMenu) input);
                 return Validacao.WAITING_INPUT;
             }
+
+            if(input instanceof Posicao){
+                Posicao tiro = (Posicao) input;
+                System.out.println("Recebi tiro(x,y): " + tiro.getX() + ", " + tiro.getY());
+                if(bnJogo.turno(this)){
+                    Mensagem mensagem = bnJogo.tiroTabuleiro(this, tiro);
+                    writeInput(mensagem);
+                    //Temos que desabilitar os tiros sem outro jogador!
+                }
+
+                return Validacao.OK;
+            }
+
 
             if(input instanceof Tabuleiro){
                 Tabuleiro tabuleiroBarcos = (Tabuleiro) input;
