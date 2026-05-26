@@ -1,17 +1,16 @@
 package library.payload.tabuleiro;
 
 import library.payload.barco.*;
-import library.payload.comunicacao.EstadosJogo;
-import library.payload.comunicacao.EstadosMenu;
-import library.payload.comunicacao.Validacao;
 
 import java.io.Serializable;
 
 public class Tabuleiro implements Serializable {
     private EstadosTabuleiro[][] celulas;
+    private boolean tabuleiroTipoTiro;
 
     public Tabuleiro(){
         celulas = new EstadosTabuleiro[10][10];
+        tabuleiroTipoTiro = false;
 
         //popular tabuleiro com MAR
         for(int i=0; i<10; i++){
@@ -20,6 +19,15 @@ public class Tabuleiro implements Serializable {
             }
         }
     }
+
+    public boolean isTabuleiroTipoTiro(){
+        return tabuleiroTipoTiro;
+    }
+
+    public void setTabuleiroTipoTiro(Boolean bool){
+        tabuleiroTipoTiro = bool;
+    }
+
 
     public void setEstadosTabuleiro(int i, int j, EstadosTabuleiro estadosTabuleiro){
         celulas[i][j] = estadosTabuleiro;

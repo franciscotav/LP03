@@ -1,5 +1,7 @@
 package batalha.naval.swing;
 
+import library.payload.tabuleiro.Tabuleiro;
+
 import javax.swing.*;
 import java.awt.event.MouseListener;
 
@@ -89,5 +91,13 @@ public class Window extends JFrame {
     public void appendLog(String log){
         areaJogo.appendLog(log);
         windowUpdate();
+    }
+
+    public void updateTabuleiroTiros(Tabuleiro tabuleiro){
+        areaJogo.updateAreaInimigo(tabuleiro);
+    }
+
+    public void updateTabuleiroBarcos(Tabuleiro tabuleiro){
+        areaJogo.updateAreaJogador(tabuleiro);
     }
 }

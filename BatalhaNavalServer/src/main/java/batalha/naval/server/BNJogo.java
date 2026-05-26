@@ -2,14 +2,13 @@ package batalha.naval.server;
 
 import library.payload.comunicacao.EstadosJogo;
 import library.payload.comunicacao.Mensagem;
-import library.payload.comunicacao.Validacao;
 import library.payload.tabuleiro.EstadosTabuleiro;
 import library.payload.tabuleiro.Posicao;
 import library.payload.tabuleiro.Tabuleiro;
 
 import java.util.Random;
 
-public class BNJogo implements Runnable{
+public class BNJogo{
     private String jogoID;
 
     private BNJogador jogadorA;
@@ -36,13 +35,17 @@ public class BNJogo implements Runnable{
 
         this.jogadorATabuleiroBarcos = null;
         this.jogadorATabuleiroTiros = new Tabuleiro();
+        this.jogadorATabuleiroTiros.setTabuleiroTipoTiro(true);
         this.jogadorBTabuleiroBarcos = null;
         this.jogadorBTabuleiroTiros = new Tabuleiro();
+        this.jogadorBTabuleiroTiros.setTabuleiroTipoTiro(true);
 
         this.tiros = 3;
 
         this.jogadorAturno = false;
         this.jogadorBturno = false;
+
+        aleatorioJogador();
 
         System.out.println("A criar jogo JogoID: " + jogoID);
     }
@@ -55,20 +58,30 @@ public class BNJogo implements Runnable{
     }
 
     public synchronized void addJogador(BNJogador bnJogador){
+        boolean addJogador = false;
+
         if(jogadorA == null){
             jogadorA = bnJogador;
-            jogadorB.writeInput(EstadosJogo.OPONENTE_CONECTION);
+            addJogador = true;
         }
-        else{
+
+        if(jogadorB == null && addJogador == false){
             jogadorB = bnJogador;
+            addJogador = true;
+        }
+
+        if(jogadorB != null && jogadorA != null){
+
+            jogadorB.writeInput(EstadosJogo.OPONENTE_CONECTION);
             jogadorA.writeInput(EstadosJogo.OPONENTE_CONECTION);
         }
+
 
         System.out.println("GameID: " + jogoID + " Addicionar PlayerID: " + bnJogador.getPlayerID());
 
     }
 
-    public void addTabuleiro(BNJogador bnJogador, Tabuleiro tabuleiroBarcos){
+    public synchronized void addTabuleiro(BNJogador bnJogador, Tabuleiro tabuleiroBarcos){
         if(bnJogador == jogadorA){
             jogadorATabuleiroBarcos = tabuleiroBarcos;
             jogadorATabuleiroBarcos.imprime();
@@ -80,21 +93,6 @@ public class BNJogo implements Runnable{
         }
     }
 
-    public void run() {
-        aleatorioJogador();
-        running = true;
-        while(running){
-            if(condicaoesJogo()){
-                if(jogadorAturno){
-
-                }else{
-
-                }
-
-            }
-        }
-    }
-
     public boolean turno(BNJogador bnJogador){
         if(jogadorAturno){
             if(jogadorA == bnJogador)
@@ -103,12 +101,16 @@ public class BNJogo implements Runnable{
             if(jogadorB == bnJogador)
                 return true;
         }
-        bnJogador.writeInput("Não é o teu turno!");
+
         return false;
     }
 
-    public Mensagem tiroTabuleiro(BNJogador bnJogador, Posicao tiro){
-            if(jogadorA == bnJogador){
+    public synchronized void tiroTabuleiro(BNJogador bnJogador, Posicao tiro){
+        if (!turno(bnJogador)) {
+            bnJogador.writeInput(new Mensagem("Não é o teu turno"));
+        }
+
+        if(jogadorA == bnJogador){
                 //verificar que já não tinhamos mandado um tiro lá
                 if(jogadorATabuleiroTiros.verificarTiro(tiro)){
                     EstadosTabuleiro estadoTabuleiro = jogadorBTabuleiroBarcos.getEstadosTabuleiro(tiro.getX(), tiro.getY());
@@ -117,17 +119,26 @@ public class BNJogo implements Runnable{
                     if(estadoTabuleiro!=EstadosTabuleiro.MAR){
                         jogadorATabuleiroTiros.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ACERTOU);
                         jogadorBTabuleiroBarcos.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.DANO);
+
+                        jogadorA.writeInput(jogadorATabuleiroTiros);
+                        //jogadorATabuleiroTiros.imprime();
+                        jogadorB.writeInput(jogadorBTabuleiroBarcos);
                         alternarTurno();
-                        return new Mensagem("Acertou");
+                        bnJogador.writeInput(new Mensagem("Acertou"));
+                        return;
                     }else{//se errar
                         jogadorATabuleiroTiros.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ERROU);
                         jogadorBTabuleiroBarcos.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ERROU);
+                        jogadorA.writeInput(jogadorATabuleiroTiros);
+                        jogadorB.writeInput(jogadorBTabuleiroBarcos);
                         alternarTurno();
-                        return new Mensagem("Errou");
+                        bnJogador.writeInput(new Mensagem("Errou"));
+                        return;
                     }
                 }
 
-                return new Mensagem("Tiro inválido");
+                bnJogador.writeInput(new Mensagem("Já foi escolhido"));
+                return;
             }
 
             //igual mas para o B
@@ -140,18 +151,27 @@ public class BNJogo implements Runnable{
                 if(estadoTabuleiro!=EstadosTabuleiro.MAR){
                     jogadorBTabuleiroTiros.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ACERTOU);
                     jogadorATabuleiroBarcos.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.DANO);
+                    jogadorB.writeInput(jogadorBTabuleiroTiros);
+                    jogadorA.writeInput(jogadorATabuleiroBarcos);
                     alternarTurno();
-                    return new Mensagem("Acertou");
+                    bnJogador.writeInput(new Mensagem("Acertou"));
+                    return;
                 }else{
                     jogadorBTabuleiroTiros.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ERROU);
                     jogadorATabuleiroBarcos.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ERROU);
+                    jogadorB.writeInput(jogadorBTabuleiroTiros);
+                    jogadorA.writeInput(jogadorATabuleiroBarcos);
                     alternarTurno();
-                    return new Mensagem("Errou");
+                    bnJogador.writeInput(new Mensagem("Errou"));
+                    return;
                 }
             }
+
+            bnJogador.writeInput(new Mensagem("Já foi escolhido"));
+            return;
         }
 
-        return new Mensagem("Tiro inválido");
+        bnJogador.writeInput(new Mensagem("Tiro inválido"));
     }
 
     private void aleatorioJogador(){
@@ -166,7 +186,7 @@ public class BNJogo implements Runnable{
         }
     }
 
-    private void alternarTurno(){
+    private synchronized void alternarTurno(){
         //se não houver tiros troca, se houver tira 1
         if(tiros==1){
             jogadorAturno = ( !jogadorAturno );

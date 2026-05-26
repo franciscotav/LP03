@@ -138,7 +138,7 @@ public class AreaJogo extends JPanel{
                 window.removeKeyListener(keyListener);
             }
 
-            cliente.sendInput(areaJogador.tabuleiroJogador);
+            cliente.sendInput(areaJogador.getTabuleiroJogador());
             areaLogs.appendLog("Enviou barcos para servidor");
         }
 
@@ -174,6 +174,16 @@ public class AreaJogo extends JPanel{
                     + " (" + xPosicaoSetup + "," + yPosicaoSetup + ") "
                     + "não consgue girar.");
         }
+    }
+
+    public void updateAreaJogador(Tabuleiro tabuleiro){
+        areaJogador.setTabuleiroJogador(tabuleiro);
+        window.windowUpdate();
+    }
+
+    public void updateAreaInimigo(Tabuleiro tabuleiro){
+        areaInimigo.setTabuleiroInimigo(tabuleiro);
+        window.windowUpdate();
     }
 
 }
@@ -245,6 +255,7 @@ class AreaInimigo extends JPanel{
         this.cliente = cliente;
 
         tabuleiroInimigo = new Tabuleiro();
+        tabuleiroInimigo.setTabuleiroTipoTiro(true);
 
         for (int j = 0; j < 10; j++) {
             for (int i = 0; i < 10; i++) {
@@ -255,10 +266,29 @@ class AreaInimigo extends JPanel{
             }
         }
     }
+
+    public Tabuleiro getTabuleiroInimigo(){
+        return tabuleiroInimigo;
+    }
+
+    public void setTabuleiroInimigo(Tabuleiro tabuleiro){
+        tabuleiroInimigo = tabuleiro;
+        updateViewFromTabuleiro();
+    }
+
+    public void updateViewFromTabuleiro(){
+        for(Component component : getComponents()){
+            if(component instanceof Casa){
+                Casa casa = (Casa) component;
+                EstadosTabuleiro getEstadosTabuleiro = tabuleiroInimigo.getEstadosTabuleiro(casa.getI(),casa.getJ());
+                casa.setColor(getEstadosTabuleiro.getColor());
+            }
+        }
+    }
 }
 
 class AreaJogador extends JPanel{
-    Tabuleiro tabuleiroJogador;
+    private Tabuleiro tabuleiroJogador;
 
     public AreaJogador(){
         setLayout(new GridLayout(10, 10, 2, 2));
@@ -274,12 +304,20 @@ class AreaJogador extends JPanel{
         }
     }
 
+    public Tabuleiro getTabuleiroJogador(){
+        return tabuleiroJogador;
+    }
+
+    public void setTabuleiroJogador(Tabuleiro tabuleiro){
+        tabuleiroJogador = tabuleiro;
+        updateViewFromTabuleiro();
+    }
+
     public Boolean verificaLimites(Barco barcoSetup, Posicao posicao, Orientacao orientacao){
         return tabuleiroJogador.verificaLimites(barcoSetup,posicao,orientacao);
     }
 
     public void updateViewFromTabuleiro(){
-
         for(Component component : getComponents()){
             if(component instanceof Casa){
                 Casa casa = (Casa) component;

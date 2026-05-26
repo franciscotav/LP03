@@ -40,44 +40,47 @@ public class BNJogador implements Runnable {
     public void run(){
         running = true;
         while(running){
-            Object resposta = readInput();
-
-            //caso o cliente dé desconect
-            if(!running) break;
-
-            writeInput(resposta);
+            readInput();
         }
 
         bnJogo.removerJogador(this);
     }
 
 
-    public Object readInput(){
+    public void readInput(){
         try{
             Object input = objectInputStream.readObject();
 
             if(input instanceof EstadosMenu){
                 opcoesIniciais((EstadosMenu) input);
-                return Validacao.WAITING_INPUT;
+                return;
             }
 
             if(input instanceof Posicao){
-                Posicao tiro = (Posicao) input;
-                System.out.println("Recebi tiro(x,y): " + tiro.getX() + ", " + tiro.getY());
-                if(bnJogo.turno(this)){
-                    Mensagem mensagem = bnJogo.tiroTabuleiro(this, tiro);
-                    writeInput(mensagem);
-                    //Temos que desabilitar os tiros sem outro jogador!
+                if(!bnJogo.condicaoesJogo()){
+                    System.out.println("PlayerID: " + playerId + " Tiro indisponivel");
+                    writeInput(new Mensagem("(Jogo não compre requesitos minimos)"));
+                    writeInput(Validacao.INVALID_INPUT);
+                    return;
                 }
 
-                return Validacao.OK;
-            }
+                Posicao tiro = (Posicao) input;
+                System.out.println("PlayerID: " + playerId +  " Tiro:(" + tiro.getX() + ", " + tiro.getY() + ")");
+                if(bnJogo.turno(this)){
+                    bnJogo.tiroTabuleiro(this, tiro);
+                }else{
+                    writeInput(new Mensagem("(Turno do oponente)"));
+                    writeInput(Validacao.INVALID_INPUT);
+                }
 
+                return;
+            }
 
             if(input instanceof Tabuleiro){
                 Tabuleiro tabuleiroBarcos = (Tabuleiro) input;
                 bnJogo.addTabuleiro(this, tabuleiroBarcos);
-                return Validacao.OK;
+                writeInput(new Mensagem("(Barcos addicionados ao servidor)"));
+                return;
             }
 
         }catch(SocketException e){
@@ -89,11 +92,13 @@ public class BNJogador implements Runnable {
             e.printStackTrace();
         }
 
-        return Validacao.ERROR;
+
+        writeInput(Validacao.ERROR);
     }
 
     public void writeInput(Object output){
         try{
+            objectOutputStream.reset();
             objectOutputStream.writeObject(output);
         }catch(SocketException e){
             System.out.println("Ligação perdida com jogador PlayerID: " + playerId);
@@ -111,9 +116,11 @@ public class BNJogador implements Runnable {
 
                 if(bnJogoDisponivel == null){
                     criarNovoJogo();
+                    writeInput(Validacao.WAITING_INPUT);
                 }else{
                     this.bnJogo = bnJogoDisponivel;
                     bnJogoDisponivel.addJogador(this);
+                    writeInput(Validacao.WAITING_INPUT);
                 }
 
                 break;
@@ -131,8 +138,6 @@ public class BNJogador implements Runnable {
         servidor.addBNJogo(bnJogo);
         this.bnJogo = bnJogo;
 
-        Thread jogoThread = new Thread(bnJogo);
-        jogoThread.start();
     }
 
     public String getPlayerID(){

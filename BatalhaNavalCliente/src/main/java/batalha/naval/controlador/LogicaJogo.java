@@ -3,7 +3,10 @@ package batalha.naval.controlador;
 import batalha.naval.cliente.Cliente;
 import batalha.naval.swing.Window;
 import library.payload.comunicacao.EstadosJogo;
+import library.payload.comunicacao.Mensagem;
 import library.payload.comunicacao.Validacao;
+import library.payload.tabuleiro.Posicao;
+import library.payload.tabuleiro.Tabuleiro;
 
 public class LogicaJogo implements Runnable {
     private Window window;
@@ -21,12 +24,31 @@ public class LogicaJogo implements Runnable {
             if (input instanceof EstadosJogo) {
                 EstadosJogo estadoJogo = (EstadosJogo) input;
                 resolveEstadosJogo(estadoJogo);
+                continue;
             }
 
             if (input instanceof Validacao) {
                 Validacao validacao = (Validacao) input;
                 window.appendLog(validacao.toString());
+                continue;
             }
+
+            if (input instanceof Tabuleiro){
+                Tabuleiro tabuleiro = (Tabuleiro) input;
+                if (tabuleiro.isTabuleiroTipoTiro()) {
+                    window.updateTabuleiroTiros(tabuleiro);
+                    tabuleiro.imprime();
+                } else {
+                    window.updateTabuleiroBarcos(tabuleiro);
+                }
+            }
+
+            if(input instanceof Mensagem){
+                Mensagem mensagem = (Mensagem) input;
+                window.appendLog(mensagem.getMensagem());
+                continue;
+            }
+
         }
     }
 

@@ -49,17 +49,6 @@ public class Cliente {
         return null;
     }
 
-    public void run(){
-        while(true){
-            Object object = readInput();
-
-            if(object instanceof Mensagem){
-                Mensagem mensagem = (Mensagem) object;
-                window.appendLog(mensagem.getMensagem());
-            }
-        }
-    }
-
     public void find(){
 
     }
