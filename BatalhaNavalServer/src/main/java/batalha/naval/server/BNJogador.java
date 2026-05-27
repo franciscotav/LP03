@@ -4,9 +4,7 @@ import library.payload.comunicacao.*;
 import library.payload.tabuleiro.Posicao;
 import library.payload.tabuleiro.Tabuleiro;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -125,11 +123,18 @@ public class BNJogador implements Runnable {
                 break;
             case CARREGAR_JOGO:
                 break;
+            case GUARDAR:
+                guardarJogo();
+                break;
             case QUIT:
                 break;
             default:
 
         }
+    }
+
+    private void guardarJogo(){
+        bnJogo.guardarJogo();
     }
 
     private void criarNovoJogo(){

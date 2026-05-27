@@ -6,6 +6,7 @@ import library.payload.tabuleiro.EstadosTabuleiro;
 import library.payload.tabuleiro.Posicao;
 import library.payload.tabuleiro.Tabuleiro;
 
+import java.io.*;
 import java.util.Random;
 
 public class BNJogo{
@@ -79,6 +80,76 @@ public class BNJogo{
 
         System.out.println("GameID: " + jogoID + " Addicionar PlayerID: " + bnJogador.getPlayerID());
 
+    }
+
+    public String getJogoId(){
+        return jogoID;
+    }
+
+    public void guardarJogo(){
+        try{
+            //escreve o primeiro objeto, se o ficheiro já existir dá overide ao conteudo do ficheiro
+            //e depois dá append aos restantes objetos
+            String path = "saves\\" + jogoID;
+            FileOutputStream out = new FileOutputStream(path);
+            ObjectOutputStream outObj = new ObjectOutputStream(out);
+
+            outObj.writeObject(jogadorATabuleiroBarcos);
+
+            out.close();
+            outObj.close();
+
+            out = new FileOutputStream(path, true);
+            outObj= new ObjectOutputStream(out);
+
+            outObj.writeObject(jogadorBTabuleiroBarcos);
+            outObj.writeObject(jogadorATabuleiroTiros);
+            outObj.writeObject(jogadorBTabuleiroTiros);
+            outObj.writeObject(jogadorAturno);
+            outObj.writeObject(jogadorBturno);
+            outObj.writeObject(tiros);
+            outObj.writeObject(started);
+            outObj.writeObject(terminou);
+
+            jogadorA.writeInput(new Mensagem("Jogo guardado!"));
+            jogadorB.writeInput(new Mensagem("Jogo guardado!"));
+        }catch(FileNotFoundException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void carregarJogo(String jogoID, boolean ecolherJogadorB){
+        try{
+            if(ecolherJogadorB){
+                jogadorB=jogadorA;
+                jogadorA=null;
+            }
+
+            String path = "saves\\" + jogoID;
+            FileInputStream in = new FileInputStream(path);
+            ObjectInputStream inObj = new ObjectInputStream(in);
+
+            this.jogoID=jogoID+"_carregado";
+            jogadorATabuleiroBarcos = (Tabuleiro) inObj.readObject();
+            jogadorBTabuleiroBarcos = (Tabuleiro) inObj.readObject();
+            jogadorATabuleiroTiros = (Tabuleiro) inObj.readObject();
+            jogadorBTabuleiroTiros = (Tabuleiro) inObj.readObject();
+            jogadorAturno = (boolean) inObj.readObject();
+            jogadorBturno = (boolean) inObj.readObject();
+            tiros = (int) inObj.readObject();
+            started = (boolean) inObj.readObject();
+            terminou = (boolean) inObj.readObject();
+
+            jogadorA.writeInput(new Mensagem("Jogo carregado!"));
+            jogadorB.writeInput(new Mensagem("Jogo guardado!"));
+        }catch(FileNotFoundException e){
+            e.printStackTrace();
+        }catch(IOException |ClassNotFoundException e){
+            e.printStackTrace();
+        }
     }
 
     public synchronized void addTabuleiro(BNJogador bnJogador, Tabuleiro tabuleiroBarcos){

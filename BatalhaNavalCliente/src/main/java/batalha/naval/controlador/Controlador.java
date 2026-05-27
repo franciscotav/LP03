@@ -69,7 +69,9 @@ public class Controlador {
         public void mouseExited(MouseEvent e) {
 
         }
+
     }
+
 
     private boolean enterServerInformation(){
         JPanel jPanel = new JPanel();

@@ -8,7 +8,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import batalha.naval.cliente.Cliente;
+import batalha.naval.controlador.Controlador;
 import library.payload.barco.*;
+import library.payload.comunicacao.EstadosMenu;
 import library.payload.tabuleiro.EstadosTabuleiro;
 import library.payload.tabuleiro.Posicao;
 import library.payload.tabuleiro.Tabuleiro;
@@ -37,7 +39,7 @@ public class AreaJogo extends JPanel{
             c.anchor = GridBagConstraints.CENTER;
 
             c.gridy = 0;
-            areaMenu = new AreaMenu();
+            areaMenu = new AreaMenu(cliente);
             add(areaMenu, c);
             c.gridy = 1;
             areaInimigo = new AreaInimigo(cliente);
@@ -191,7 +193,9 @@ public class AreaJogo extends JPanel{
 class AreaMenu extends JPanel{
     private JButton guardarJogoButton;
     private JButton desconectarButton;
-    public AreaMenu() {
+    private Cliente cliente;
+
+    public AreaMenu(Cliente cliente) {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -199,6 +203,8 @@ class AreaMenu extends JPanel{
         guardarJogoButton = new JButton("Guardar");
         setButtonStyle(guardarJogoButton);
         add(guardarJogoButton);
+        guardarJogoButton.addMouseListener(new GuardarJogoButton(cliente));
+
         add(Box.createHorizontalStrut(20));
 
         desconectarButton = new JButton("Desconectar");
@@ -206,7 +212,13 @@ class AreaMenu extends JPanel{
         add(desconectarButton);
 
         add(Box.createHorizontalGlue());
+
+        this.cliente=cliente;
     }
+
+    public void setGuardarJogoButton(MouseListener e){guardarJogoButton.addMouseListener(e);}
+
+    public void setDesconectarButton(MouseListener e){desconectarButton.addMouseListener(e);}
 
     private void setButtonStyle(JButton jButton){
         jButton.setFont(new Font("Segoe UI Symbol", Font.BOLD, 25));
@@ -503,6 +515,42 @@ class CasaMouseAdaptar implements MouseListener{
             if(component instanceof JFrame)
                 ((JFrame)component).requestFocusInWindow();
         }
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+}
+
+class  GuardarJogoButton implements MouseListener{
+    private Cliente cliente;
+
+    public GuardarJogoButton(Cliente cliente){
+        this.cliente=cliente;
+        System.out.println("Criou!");
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        System.out.println("Clicou!");
+        cliente.sendInput(EstadosMenu.GUARDAR);
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
     }
 
     @Override
