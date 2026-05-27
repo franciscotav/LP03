@@ -79,7 +79,6 @@ public class BNJogador implements Runnable {
             if(input instanceof Tabuleiro){
                 Tabuleiro tabuleiroBarcos = (Tabuleiro) input;
                 bnJogo.addTabuleiro(this, tabuleiroBarcos);
-                writeInput(new Mensagem("(Barcos addicionados ao servidor)"));
                 return;
             }
 

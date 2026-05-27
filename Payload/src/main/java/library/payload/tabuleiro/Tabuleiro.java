@@ -168,10 +168,38 @@ public class Tabuleiro implements Serializable {
     public void imprime(){
         for (int j = 0; j < 10; j++) {
             for (int i = 0; i < 10; i++) {
-                System.out.print(celulas[i][j].ordinal() + " ");;
+                System.out.print(celulas[i][j].ordinal() + " ");
             }
             System.out.println();
         }
+    }
+
+    public boolean barcoExiste(EstadosTabuleiro barco) {
+        for (int j = 0; j < 10; j++) {
+            for (int i = 0; i < 10; i++) {
+                if (celulas[i][j] == barco)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean semBarcos(){
+        for (int j = 0; j < 10; j++) {
+            for (int i = 0; i < 10; i++) {
+                EstadosTabuleiro estado = celulas[i][j];
+                if(estado != EstadosTabuleiro.MAR &&
+                        estado != EstadosTabuleiro.DANO &&
+                        estado != EstadosTabuleiro.ERROU
+                ){
+                    return false;
+                }
+
+            }
+        }
+
+        return true;
     }
 
     public boolean verificarTiro(Posicao posicao){

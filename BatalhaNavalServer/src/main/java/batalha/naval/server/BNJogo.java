@@ -21,7 +21,8 @@ public class BNJogo{
 
     private int tiros;
 
-    private boolean running;
+    private boolean started;
+    private boolean terminou;
 
     private boolean jogadorAturno;
     private boolean jogadorBturno;
@@ -31,7 +32,8 @@ public class BNJogo{
         this.jogadorB = null;
 
         this.jogoID = jogoID;
-        this.running = false;
+        this.started = false;
+        this.terminou = false;
 
         this.jogadorATabuleiroBarcos = null;
         this.jogadorATabuleiroTiros = new Tabuleiro();
@@ -71,11 +73,9 @@ public class BNJogo{
         }
 
         if(jogadorB != null && jogadorA != null){
-
             jogadorB.writeInput(EstadosJogo.OPONENTE_CONECTION);
             jogadorA.writeInput(EstadosJogo.OPONENTE_CONECTION);
         }
-
 
         System.out.println("GameID: " + jogoID + " Addicionar PlayerID: " + bnJogador.getPlayerID());
 
@@ -84,13 +84,29 @@ public class BNJogo{
     public synchronized void addTabuleiro(BNJogador bnJogador, Tabuleiro tabuleiroBarcos){
         if(bnJogador == jogadorA){
             jogadorATabuleiroBarcos = tabuleiroBarcos;
-            jogadorATabuleiroBarcos.imprime();
+            //jogadorATabuleiroBarcos.imprime();
         }
 
         if(bnJogador == jogadorB){
             jogadorBTabuleiroBarcos = tabuleiroBarcos;
-            jogadorBTabuleiroBarcos.imprime();
+            //jogadorBTabuleiroBarcos.imprime();
         }
+
+        if(jogadorATabuleiroBarcos != null &&
+                jogadorBTabuleiroBarcos != null){
+
+            started = true;
+            jogadorA.writeInput(new Mensagem("Comecou a jogo!"));
+            jogadorB.writeInput(new Mensagem("Comecou a jogo!"));
+            if(turno(jogadorA)){
+                jogadorA.writeInput(new Mensagem("Teu turno!"));
+                jogadorB.writeInput(new Mensagem("Turno do adversario!"));
+            }else{
+                jogadorB.writeInput(new Mensagem("Teu turno!"));
+                jogadorA.writeInput(new Mensagem("Turno do adversario!"));
+            }
+        }
+
     }
 
     public boolean turno(BNJogador bnJogador){
@@ -106,8 +122,14 @@ public class BNJogo{
     }
 
     public synchronized void tiroTabuleiro(BNJogador bnJogador, Posicao tiro){
+        if (!started || terminou) {
+            bnJogador.writeInput(new Mensagem("Jogo não está a decorrer"));
+            return;
+        }
+
         if (!turno(bnJogador)) {
             bnJogador.writeInput(new Mensagem("Não é o teu turno"));
+            return;
         }
 
         if(jogadorA == bnJogador){
@@ -123,21 +145,33 @@ public class BNJogo{
                         jogadorA.writeInput(jogadorATabuleiroTiros);
                         //jogadorATabuleiroTiros.imprime();
                         jogadorB.writeInput(jogadorBTabuleiroBarcos);
+                        bnJogador.writeInput(new Mensagem("Acertou!"));
+                        jogadorB.writeInput(new Mensagem("Barco atingido!"));
+                        if(!jogadorBTabuleiroBarcos.barcoExiste(estadoTabuleiro)){
+                            bnJogador.writeInput(new Mensagem(estadoTabuleiro.name() + " destruido!"));
+                            jogadorB.writeInput(new Mensagem(estadoTabuleiro.name() + " afundou!"));
+                        }
+                        if(jogadorBTabuleiroBarcos.semBarcos()){
+                            bnJogador.writeInput(new Mensagem("Vitoria!"));
+                            jogadorB.writeInput(new Mensagem("Derrota!"));
+                            terminou = true;
+                            return;
+                        }
                         alternarTurno();
-                        bnJogador.writeInput(new Mensagem("Acertou"));
                         return;
                     }else{//se errar
                         jogadorATabuleiroTiros.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ERROU);
                         jogadorBTabuleiroBarcos.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ERROU);
                         jogadorA.writeInput(jogadorATabuleiroTiros);
                         jogadorB.writeInput(jogadorBTabuleiroBarcos);
+                        bnJogador.writeInput(new Mensagem("Tiro no Mar!"));
+                        jogadorB.writeInput(new Mensagem("Adversario atirou no mar!"));
                         alternarTurno();
-                        bnJogador.writeInput(new Mensagem("Errou"));
                         return;
                     }
                 }
 
-                bnJogador.writeInput(new Mensagem("Já foi escolhido"));
+                bnJogador.writeInput(new Mensagem("Já foi selecionada!"));
                 return;
             }
 
@@ -153,25 +187,39 @@ public class BNJogo{
                     jogadorATabuleiroBarcos.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.DANO);
                     jogadorB.writeInput(jogadorBTabuleiroTiros);
                     jogadorA.writeInput(jogadorATabuleiroBarcos);
+
+                    bnJogador.writeInput(new Mensagem("Acertou!"));
+                    jogadorA.writeInput(new Mensagem("Barco atingido!"));
+
+                    if(!jogadorATabuleiroBarcos.barcoExiste(estadoTabuleiro)){
+                        bnJogador.writeInput(new Mensagem(estadoTabuleiro.name() + " destruido!"));
+                        jogadorA.writeInput(new Mensagem(estadoTabuleiro.name() + " afundou!"));
+                    }
+                    if(jogadorATabuleiroBarcos.semBarcos()){
+                        bnJogador.writeInput(new Mensagem("Vitoria!"));
+                        jogadorA.writeInput(new Mensagem("Derrota!"));
+                        terminou = true;
+                        return;
+                    }
                     alternarTurno();
-                    bnJogador.writeInput(new Mensagem("Acertou"));
                     return;
                 }else{
                     jogadorBTabuleiroTiros.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ERROU);
                     jogadorATabuleiroBarcos.setEstadosTabuleiro(tiro.getX(), tiro.getY(), EstadosTabuleiro.ERROU);
                     jogadorB.writeInput(jogadorBTabuleiroTiros);
                     jogadorA.writeInput(jogadorATabuleiroBarcos);
+                    bnJogador.writeInput(new Mensagem("Tiro no Mar!"));
+                    jogadorA.writeInput(new Mensagem("Adversario atirou no mar!"));
                     alternarTurno();
-                    bnJogador.writeInput(new Mensagem("Errou"));
                     return;
                 }
             }
 
-            bnJogador.writeInput(new Mensagem("Já foi escolhido"));
+            bnJogador.writeInput(new Mensagem("Já foi selecionada!"));
             return;
         }
 
-        bnJogador.writeInput(new Mensagem("Tiro inválido"));
+        bnJogador.writeInput(new Mensagem("Tiro inválido!"));
     }
 
     private void aleatorioJogador(){
@@ -191,9 +239,19 @@ public class BNJogo{
         if(tiros==1){
             jogadorAturno = ( !jogadorAturno );
             jogadorBturno = ( !jogadorBturno );
-            this.tiros = 3;
-        }else{
+            tiros = 3;
+        } else {
             tiros--;
+        }
+
+        if(jogadorAturno){
+            jogadorA.writeInput(new Mensagem("Teu turno!"));
+            jogadorA.writeInput(new Mensagem("Numero de tiros: " + tiros));
+            jogadorB.writeInput(new Mensagem("Turno do adversario!"));
+        }else{
+            jogadorB.writeInput(new Mensagem("Teu turno!"));
+            jogadorB.writeInput(new Mensagem("Numero de tiros: " + tiros));
+            jogadorA.writeInput(new Mensagem("Turno do adversario!"));
         }
 
     }
@@ -220,7 +278,7 @@ public class BNJogo{
         }
 
         if(jogadorA == null && jogadorB == null){
-            running = false;
+            started = false;
             System.out.println("GameID: " + jogoID + " Sem Jogadores");
         }
     }

@@ -261,7 +261,7 @@ class AreaInimigo extends JPanel{
             for (int i = 0; i < 10; i++) {
                 Color cor = tabuleiroInimigo.getEstadosTabuleiro(i,j).getColor();
                 Casa casa = new Casa(i,j,cor);
-                casa.addCasaMouseAdaptar(new CasaMouseAdaptar(cliente));
+                casa.addCasaMouseAdaptar(new CasaInimigoMouseAdaptar(cliente));
                 add(casa);
             }
         }
@@ -299,6 +299,7 @@ class AreaJogador extends JPanel{
             for (int i = 0; i < 10; i++) {
                 Color cor = tabuleiroJogador.getEstadosTabuleiro(i,j).getColor();
                 Casa casa = new Casa(i,j,cor);
+                casa.addMouseListener(new CasaMouseAdaptar());
                 add(casa);
             }
         }
@@ -384,7 +385,7 @@ class Casa extends JButton{
         setStyle();
     }
 
-    public void addCasaMouseAdaptar(CasaMouseAdaptar casaMouseAdaptar){
+    public void addCasaMouseAdaptar(CasaInimigoMouseAdaptar casaMouseAdaptar){
         this.addMouseListener(casaMouseAdaptar);
     }
 
@@ -419,11 +420,10 @@ class Casa extends JButton{
 
 }
 
-//inner class
-class CasaMouseAdaptar implements MouseListener{
-private Cliente cliente;
+class CasaInimigoMouseAdaptar implements MouseListener{
+    private Cliente cliente;
 
-    public CasaMouseAdaptar(Cliente cliente){
+    public CasaInimigoMouseAdaptar(Cliente cliente){
         this.cliente=cliente;
     }
 
@@ -435,9 +435,13 @@ private Cliente cliente;
 
             Posicao posicao = new Posicao(casa.getI(),casa.getJ());
             cliente.sendInput(posicao);
-
         }
 
+        while(component != null){
+            component = component.getParent();
+            if(component instanceof JFrame)
+                ((JFrame)component).requestFocusInWindow();
+        }
     }
 
     @Override
@@ -452,7 +456,53 @@ private Cliente cliente;
 
     @Override
     public void mouseEntered(MouseEvent e) {
+        Component component = e.getComponent();
 
+        while(component != null){
+            component = component.getParent();
+            if(component instanceof JFrame)
+                ((JFrame)component).requestFocusInWindow();
+        }
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+}
+
+class CasaMouseAdaptar implements MouseListener{
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        Component component = e.getComponent();
+
+        while(component != null){
+            component = component.getParent();
+            if(component instanceof JFrame)
+                ((JFrame)component).requestFocusInWindow();
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        Component component = e.getComponent();
+
+        while(component != null){
+            component = component.getParent();
+            if(component instanceof JFrame)
+                ((JFrame)component).requestFocusInWindow();
+        }
     }
 
     @Override
