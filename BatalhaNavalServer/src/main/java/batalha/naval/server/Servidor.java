@@ -45,6 +45,13 @@ public class Servidor{
         return bnJogos;
     }
 
+    public BNJogo getBNJogo(String idJogo){
+        for(BNJogo bnJogo: bnJogos){
+            if(bnJogo.getJogoId()==idJogo) return bnJogo;
+        }
+        return null;
+    }
+
     public void addBNJogo(BNJogo bnJogo){
         bnJogos.add(bnJogo);
     }

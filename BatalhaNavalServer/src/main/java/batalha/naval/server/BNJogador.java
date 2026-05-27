@@ -95,12 +95,24 @@ public class BNJogador implements Runnable {
 
     public void lerDadosCarregar(){
         try{
+            System.out.println("lerDadosCarregar");
             Mensagem jogoID = (Mensagem) objectInputStream.readObject();
             boolean jogadorA = (boolean) objectInputStream.readObject();
-            criarNovoJogo();
 
-            bnJogo.carregarJogo(jogoID.getMensagem(), jogadorA);
-            bnJogo.atulizarView();
+            BNJogo tempBNJogo = servidor.getBNJogo(jogoID.getMensagem() + "_carregado");
+
+            if(tempBNJogo==null){
+                criarNovoJogo();
+
+                bnJogo.carregarJogo(jogoID.getMensagem(), jogadorA);
+                bnJogo.atulizarView();
+            }else{
+                tempBNJogo.addJogador(this);
+
+                bnJogo = tempBNJogo;
+            }
+
+
         }catch(SocketException e){
             System.out.println("Ligação perdida com jogador PlayerID: " + playerId);
             running = false;
