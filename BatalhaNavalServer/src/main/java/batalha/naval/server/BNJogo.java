@@ -87,195 +87,47 @@ public class BNJogo {
     }
 
     public void guardarJogo() {
-        try {
-            String path = "saves\\" + jogoID + "\\";
+        String path = "saves\\" + jogoID;
 
-            String[] ficheiros = {"jogadorATabuleiroBarcos",
-                    "jogadorATabuleiroTiros",
-                    "jogadorAturno",
-                    "jogadorBTabuleiroBarcos",
-                    "jogadorBTabuleiroTiros",
-                    "jogadorBturno",
-                    "tiros",
-                    "started",
-                    "terminou"};
+        Dados dados = new Dados(jogadorATabuleiroBarcos, jogadorATabuleiroTiros, jogadorBTabuleiroBarcos, jogadorBTabuleiroTiros, jogadorAturno, jogadorBturno, tiros);
+        Dados.write(path,dados);
 
-            String finalPath = path + ficheiros[0];
-            FileOutputStream out = new FileOutputStream(finalPath);
-            ObjectOutputStream outObj = new ObjectOutputStream(out);
-            outObj.writeObject(jogadorATabuleiroBarcos);
-            out.close();
-            outObj.close();
-
-            finalPath = path + ficheiros[1];
-            out = new FileOutputStream(finalPath);
-            outObj = new ObjectOutputStream(out);
-            outObj.writeObject(jogadorATabuleiroTiros);
-            out.close();
-            outObj.close();
-
-            finalPath = path + ficheiros[2];
-            out = new FileOutputStream(finalPath);
-            outObj = new ObjectOutputStream(out);
-            outObj.writeObject((Boolean) jogadorAturno);
-            out.close();
-            outObj.close();
-
-            finalPath = path + ficheiros[3];
-            out = new FileOutputStream(finalPath);
-            outObj = new ObjectOutputStream(out);
-            outObj.writeObject(jogadorBTabuleiroBarcos);
-            out.close();
-            outObj.close();
-
-            finalPath = path + ficheiros[4];
-            out = new FileOutputStream(finalPath);
-            outObj = new ObjectOutputStream(out);
-            outObj.writeObject(jogadorBTabuleiroTiros);
-            out.close();
-            outObj.close();
-
-            finalPath = path + ficheiros[5];
-            out = new FileOutputStream(finalPath);
-            outObj = new ObjectOutputStream(out);
-            outObj.writeObject((Boolean) jogadorBturno);
-            out.close();
-            outObj.close();
-
-            finalPath = path + ficheiros[6];
-            out = new FileOutputStream(finalPath);
-            outObj = new ObjectOutputStream(out);
-            outObj.writeObject((Integer) tiros);
-            out.close();
-            outObj.close();
-
-            finalPath = path + ficheiros[7];
-            out = new FileOutputStream(finalPath);
-            outObj = new ObjectOutputStream(out);
-            outObj.writeObject((Boolean) started);
-            out.close();
-            outObj.close();
-
-            finalPath = path + ficheiros[8];
-            out = new FileOutputStream(finalPath);
-            outObj = new ObjectOutputStream(out);
-            outObj.writeObject((Boolean) terminou);
-            out.close();
-            outObj.close();
-
-
-            if (jogadorA != null)
-                jogadorA.writeInput(new Mensagem("Jogo guardado!"));
-            if (jogadorB != null)
-                jogadorB.writeInput(new Mensagem("Jogo guardado!"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        if (jogadorA != null)
+            jogadorA.writeInput(new Mensagem("Jogo guardado!"));
+        if (jogadorB != null)
+            jogadorB.writeInput(new Mensagem("Jogo guardado!"));
     }
 
     public void carregarJogo(String jogoID, boolean ecolherJogadorB) {
-        try {
-            if (ecolherJogadorB) {
-                jogadorB = jogadorA;
-                jogadorA = null;
-            }
-
-            this.jogoID = jogoID + "_carregado";
-
-            String path = "saves\\" + jogoID + "\\";
-
-            String[] ficheiros = {"jogadorATabuleiroBarcos",
-                    "jogadorATabuleiroTiros",
-                    "jogadorAturno",
-                    "jogadorBTabuleiroBarcos",
-                    "jogadorBTabuleiroTiros",
-                    "jogadorBturno",
-                    "tiros",
-                    "started",
-                    "terminou"};
-
-            String finalPath = path + ficheiros[0];
-            FileInputStream in = new FileInputStream(finalPath);
-            ObjectInputStream inObj = new ObjectInputStream(in);
-            jogadorATabuleiroBarcos = (Tabuleiro) inObj.readObject();
-            in.close();
-            inObj.close();
-
-            finalPath = path + ficheiros[1];
-            in = new FileInputStream(finalPath);
-            inObj = new ObjectInputStream(in);
-            jogadorATabuleiroTiros = (Tabuleiro) inObj.readObject();
-            in.close();
-            inObj.close();
-
-            finalPath = path + ficheiros[2];
-            in = new FileInputStream(finalPath);
-            inObj = new ObjectInputStream(in);
-            jogadorAturno = (Boolean) inObj.readObject();
-            in.close();
-            inObj.close();
-
-            finalPath = path + ficheiros[3];
-            in = new FileInputStream(finalPath);
-            inObj = new ObjectInputStream(in);
-            jogadorBTabuleiroBarcos = (Tabuleiro) inObj.readObject();
-            in.close();
-            inObj.close();
-
-            finalPath = path + ficheiros[4];
-            in = new FileInputStream(finalPath);
-            inObj = new ObjectInputStream(in);
-            jogadorBTabuleiroTiros = (Tabuleiro) inObj.readObject();
-            in.close();
-            inObj.close();
-
-            finalPath = path + ficheiros[5];
-            in = new FileInputStream(finalPath);
-            inObj = new ObjectInputStream(in);
-            jogadorBturno = (Boolean) inObj.readObject();
-            in.close();
-            inObj.close();
-
-            finalPath = path + ficheiros[6];
-            in = new FileInputStream(finalPath);
-            inObj = new ObjectInputStream(in);
-            tiros = (Integer) inObj.readObject();
-            in.close();
-            inObj.close();
-
-            finalPath = path + ficheiros[7];
-            in = new FileInputStream(finalPath);
-            inObj = new ObjectInputStream(in);
-            started = (Boolean) inObj.readObject();
-            in.close();
-            inObj.close();
-
-            finalPath = path + ficheiros[8];
-            in = new FileInputStream(finalPath);
-            inObj = new ObjectInputStream(in);
-            terminou = (Boolean) inObj.readObject();
-            in.close();
-            inObj.close();
-
-            if (jogadorA != null)
-                jogadorA.writeInput(new Mensagem("Jogo carregado!"));
-            if (jogadorB != null)
-                jogadorB.writeInput(new Mensagem("Jogo carregado!"));
-
-            inObj.close();
-
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+        if (ecolherJogadorB) {
+            jogadorB = jogadorA;
+            jogadorA = null;
         }
+
+        String path = "saves\\" + jogoID;
+
+        Dados dados = Dados.read(path);
+        if(dados == null)
+            return;
+
+        this.jogadorATabuleiroBarcos = dados.getJogadorATabuleiroBarcos();
+        this.jogadorATabuleiroTiros = dados.getJogadorATabuleiroTiros();
+        this.jogadorBTabuleiroBarcos = dados.getJogadorBTabuleiroBarcos();
+        this.jogadorBTabuleiroTiros = dados.getJogadorBTabuleiroTiros();
+        this.jogadorAturno = dados.getJogadorAturno();
+        this.jogadorBturno = dados.getJogadorBturno();
+        this.tiros = dados.getTiros();
+
+        this.jogoID = jogoID + "_carregado";
+
+
+        if (jogadorA != null)
+            jogadorA.writeInput(new Mensagem("Jogo carregado!"));
+        if (jogadorB != null)
+            jogadorB.writeInput(new Mensagem("Jogo carregado!"));
     }
 
-    public void atulizarView() {
+    public void atulizarViews() {
         if (jogadorA != null) {
             jogadorA.writeInput(jogadorATabuleiroBarcos);
             jogadorA.writeInput(jogadorATabuleiroTiros);
@@ -490,6 +342,100 @@ public class BNJogo {
             started = false;
             System.out.println("GameID: " + jogoID + " Sem Jogadores");
         }
+    }
+
+}
+
+class Dados implements Serializable{
+    private Tabuleiro jogadorATabuleiroBarcos;
+    private Tabuleiro jogadorATabuleiroTiros;
+    private Tabuleiro jogadorBTabuleiroBarcos;
+    private Tabuleiro jogadorBTabuleiroTiros;
+    private Boolean jogadorAturno;
+    private Boolean jogadorBturno;
+    private Integer tiros;
+
+    public Dados(Tabuleiro jogadorATabuleiroBarcos, Tabuleiro jogadorATabuleiroTiros, Tabuleiro jogadorBTabuleiroBarcos, Tabuleiro jogadorBTabuleiroTiros, Boolean jogadorAturno, Boolean jogadorBturno, Integer tiros) {
+        this.jogadorATabuleiroBarcos = jogadorATabuleiroBarcos;
+        this.jogadorATabuleiroTiros = jogadorATabuleiroTiros;
+        this.jogadorBTabuleiroBarcos = jogadorBTabuleiroBarcos;
+        this.jogadorBTabuleiroTiros = jogadorBTabuleiroTiros;
+        this.jogadorAturno = jogadorAturno;
+        this.jogadorBturno = jogadorBturno;
+        this.tiros = tiros;
+    }
+
+    public Integer getTiros() {
+        return tiros;
+    }
+
+    public Boolean getJogadorBturno() {
+        return jogadorBturno;
+    }
+
+    public Boolean getJogadorAturno() {
+        return jogadorAturno;
+    }
+
+    public Tabuleiro getJogadorBTabuleiroTiros() {
+        return jogadorBTabuleiroTiros;
+    }
+
+    public Tabuleiro getJogadorBTabuleiroBarcos() {
+        return jogadorBTabuleiroBarcos;
+    }
+
+    public Tabuleiro getJogadorATabuleiroTiros() {
+        return jogadorATabuleiroTiros;
+    }
+
+    public Tabuleiro getJogadorATabuleiroBarcos() {
+        return jogadorATabuleiroBarcos;
+    }
+
+    public static void write(String path, Dados dados){
+        try{
+            File file = new File(path);
+            if (file.getParentFile() != null) {
+                file.getParentFile().mkdirs();
+            }
+
+            FileOutputStream out = new FileOutputStream(file);
+            ObjectOutputStream outObj = new ObjectOutputStream(out);
+            outObj.writeObject(dados);
+
+            outObj.close();
+
+            System.out.println("Gravou Jogo: " + path);
+        }catch (FileNotFoundException e){
+            System.out.println("Não conseguiu criar ficherio para escrever: " + path);
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static Dados read(String path){
+        try{
+            File file = new File(path);
+
+            FileInputStream in = new FileInputStream(file);
+            ObjectInputStream inObj = new ObjectInputStream(in);
+            Dados dados = (Dados) inObj.readObject();
+
+            System.out.println("Carregou Jogo: " + path);
+            return dados;
+
+        }catch (FileNotFoundException e){
+            System.out.println("Ficheiro não encontrado para ler: " + path);
+            e.printStackTrace();
+        }catch(ClassNotFoundException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 }

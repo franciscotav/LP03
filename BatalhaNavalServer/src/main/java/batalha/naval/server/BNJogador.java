@@ -37,21 +37,21 @@ public class BNJogador implements Runnable {
 
     public void run(){
         running = true;
+
         while(running){
-            readInput();
+            running = readInput();
         }
 
         bnJogo.removerJogador(this);
     }
 
 
-    public void readInput(){
+    public boolean readInput(){
         try{
             Object input = objectInputStream.readObject();
 
             if(input instanceof EstadosMenu){
-                opcoesIniciais((EstadosMenu) input);
-                return;
+                return opcoesIniciais((EstadosMenu) input);
             }
 
             if(input instanceof Posicao){
@@ -59,7 +59,7 @@ public class BNJogador implements Runnable {
                     System.out.println("PlayerID: " + playerId + " Tiro indisponivel");
                     writeInput(new Mensagem("(Jogo não compre requesitos minimos)"));
                     writeInput(Validacao.INVALID_INPUT);
-                    return;
+                    return true;
                 }
 
                 Posicao tiro = (Posicao) input;
@@ -71,13 +71,13 @@ public class BNJogador implements Runnable {
                     writeInput(Validacao.INVALID_INPUT);
                 }
 
-                return;
+                return true;
             }
 
             if(input instanceof Tabuleiro){
                 Tabuleiro tabuleiroBarcos = (Tabuleiro) input;
                 bnJogo.addTabuleiro(this, tabuleiroBarcos);
-                return;
+                return true;
             }
 
         }catch(SocketException e){
@@ -91,24 +91,23 @@ public class BNJogador implements Runnable {
 
 
         writeInput(Validacao.ERROR);
+        return true;
     }
 
     public void lerDadosCarregar(){
         try{
-            System.out.println("lerDadosCarregar");
             Mensagem jogoID = (Mensagem) objectInputStream.readObject();
-            boolean jogadorA = (boolean) objectInputStream.readObject();
+            boolean jogadorB = (Boolean) objectInputStream.readObject();
 
             BNJogo tempBNJogo = servidor.getBNJogo(jogoID.getMensagem() + "_carregado");
 
             if(tempBNJogo==null){
                 criarNovoJogo();
 
-                bnJogo.carregarJogo(jogoID.getMensagem(), jogadorA);
-                bnJogo.atulizarView();
+                bnJogo.carregarJogo(jogoID.getMensagem(), jogadorB);
+                bnJogo.atulizarViews();
             }else{
                 tempBNJogo.addJogador(this);
-
                 bnJogo = tempBNJogo;
             }
 
@@ -139,7 +138,7 @@ public class BNJogador implements Runnable {
         }
     }
 
-    private void opcoesIniciais(EstadosMenu estado){
+    private boolean opcoesIniciais(EstadosMenu estado){
         switch(estado){
             case NOVO_JOGO:
                 BNJogo bnJogoDisponivel = servidor.getBNJogoDisponivel();
@@ -161,10 +160,10 @@ public class BNJogador implements Runnable {
                 guardarJogo();
                 break;
             case QUIT:
-                break;
-            default:
-
+                return false;
         }
+
+        return true;
     }
 
     private void guardarJogo(){
