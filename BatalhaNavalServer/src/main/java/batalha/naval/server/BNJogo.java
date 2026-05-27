@@ -88,31 +88,24 @@ public class BNJogo{
 
     public void guardarJogo(){
         try{
-            //escreve o primeiro objeto, se o ficheiro já existir dá overide ao conteudo do ficheiro
-            //e depois dá append aos restantes objetos
             String path = "saves\\" + jogoID;
-            FileOutputStream out = new FileOutputStream(path);
-            ObjectOutputStream outObj = new ObjectOutputStream(out);
+           
+            try (FileOutputStream out = new FileOutputStream(path);
+                 ObjectOutputStream outObj = new ObjectOutputStream(out)) {
 
-            outObj.writeObject(jogadorATabuleiroBarcos);
+                outObj.writeObject(jogadorATabuleiroBarcos);
+                outObj.writeObject(jogadorBTabuleiroBarcos);
+                outObj.writeObject(jogadorATabuleiroTiros);
+                outObj.writeObject(jogadorBTabuleiroTiros);
+                outObj.writeObject(jogadorAturno);
+                outObj.writeObject(jogadorBturno);
+                outObj.writeObject(tiros);
+                outObj.writeObject(started);
+                outObj.writeObject(terminou);
+            }
 
-            out.close();
-            outObj.close();
-
-            out = new FileOutputStream(path, true);
-            outObj= new ObjectOutputStream(out);
-
-            outObj.writeObject(jogadorBTabuleiroBarcos);
-            outObj.writeObject(jogadorATabuleiroTiros);
-            outObj.writeObject(jogadorBTabuleiroTiros);
-            outObj.writeObject(jogadorAturno);
-            outObj.writeObject(jogadorBturno);
-            outObj.writeObject(tiros);
-            outObj.writeObject(started);
-            outObj.writeObject(terminou);
-
-            jogadorA.writeInput(new Mensagem("Jogo guardado!"));
-            jogadorB.writeInput(new Mensagem("Jogo guardado!"));
+            if (jogadorA != null) jogadorA.writeInput(new Mensagem("Jogo guardado!"));
+            if (jogadorB != null) jogadorB.writeInput(new Mensagem("Jogo guardado!"));
         }catch(FileNotFoundException e){
             e.printStackTrace();
         }catch(IOException e){
