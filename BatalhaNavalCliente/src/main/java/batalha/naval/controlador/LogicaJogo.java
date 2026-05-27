@@ -8,6 +8,8 @@ import library.payload.comunicacao.Validacao;
 import library.payload.tabuleiro.Posicao;
 import library.payload.tabuleiro.Tabuleiro;
 
+import java.awt.event.KeyListener;
+
 public class LogicaJogo implements Runnable {
     private Window window;
     private Cliente cliente;
@@ -37,10 +39,13 @@ public class LogicaJogo implements Runnable {
                 Tabuleiro tabuleiro = (Tabuleiro) input;
                 if (tabuleiro.isTabuleiroTipoTiro()) {
                     window.updateTabuleiroTiros(tabuleiro);
+
                     tabuleiro.imprime();
                 } else {
                     window.updateTabuleiroBarcos(tabuleiro);
                 }
+
+                removeKeyListener();
             }
 
             if(input instanceof Mensagem){
@@ -49,6 +54,13 @@ public class LogicaJogo implements Runnable {
                 continue;
             }
 
+        }
+    }
+
+    private void removeKeyListener(){
+        KeyListener[] keyListeners = window.getKeyListeners();
+        for(KeyListener keyListener : keyListeners){
+            window.removeKeyListener(keyListener);
         }
     }
 

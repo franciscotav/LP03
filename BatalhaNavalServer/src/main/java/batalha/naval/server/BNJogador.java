@@ -102,13 +102,23 @@ public class BNJogador implements Runnable {
             BNJogo tempBNJogo = servidor.getBNJogo(jogoID.getMensagem() + "_carregado");
 
             if(tempBNJogo==null){
-                criarNovoJogo();
+                System.out.println("1ND");
+                BNJogo novoJogo = new BNJogo(this, servidor.criarJogoID());
 
-                bnJogo.carregarJogo(jogoID.getMensagem(), jogadorB);
+                novoJogo.carregarJogo(jogoID.getMensagem(), jogadorB);
+                servidor.addBNJogo(novoJogo);
+
+                bnJogo = novoJogo;
                 bnJogo.atulizarViews();
             }else{
                 tempBNJogo.addJogador(this);
+
                 bnJogo = tempBNJogo;
+                bnJogo.atulizarViews();
+
+                if(bnJogo.condicaoesJogo()){
+                    bnJogo.jogoComecou(true);
+                }
             }
 
 
@@ -117,12 +127,14 @@ public class BNJogador implements Runnable {
             running = false;
         }catch (IOException e) {
             e.printStackTrace();
+            writeInput(Validacao.ERROR);
         }catch(ClassNotFoundException e){
             e.printStackTrace();
+            writeInput(Validacao.ERROR);
         }
 
 
-        writeInput(Validacao.ERROR);
+
     }
 
     public void writeInput(Object output){

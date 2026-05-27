@@ -47,7 +47,9 @@ public class Servidor{
 
     public BNJogo getBNJogo(String idJogo){
         for(BNJogo bnJogo: bnJogos){
-            if(bnJogo.getJogoId()==idJogo) return bnJogo;
+            if(bnJogo.getJogoId().equals(idJogo)){
+                return bnJogo;
+            }
         }
         return null;
     }

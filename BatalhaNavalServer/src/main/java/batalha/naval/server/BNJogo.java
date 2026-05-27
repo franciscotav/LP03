@@ -60,6 +60,10 @@ public class BNJogo {
         return false;
     }
 
+    public void jogoComecou(boolean bool){
+        started = bool;
+    }
+
     public synchronized void addJogador(BNJogador bnJogador) {
         boolean addJogador = false;
 
@@ -92,10 +96,16 @@ public class BNJogo {
         Dados dados = new Dados(jogadorATabuleiroBarcos, jogadorATabuleiroTiros, jogadorBTabuleiroBarcos, jogadorBTabuleiroTiros, jogadorAturno, jogadorBturno, tiros);
         Dados.write(path,dados);
 
-        if (jogadorA != null)
-            jogadorA.writeInput(new Mensagem("Jogo guardado!"));
-        if (jogadorB != null)
-            jogadorB.writeInput(new Mensagem("Jogo guardado!"));
+        if (jogadorA != null){
+            jogadorA.writeInput(new Mensagem("Jogo guardado:"));
+            jogadorA.writeInput(new Mensagem("JogoID: " + jogoID + " (Jogador A)"));
+        }
+
+        if (jogadorB != null){
+            jogadorB.writeInput(new Mensagem("Jogo guardado:"));
+            jogadorB.writeInput(new Mensagem("JogoID: " + jogoID + " (Jogador B)"));
+        }
+
     }
 
     public void carregarJogo(String jogoID, boolean ecolherJogadorB) {

@@ -81,7 +81,6 @@ public class Controlador {
         @Override
         public void mouseClicked(MouseEvent e) {
             if(!enterServerInformationCarregarJogo()) return;
-            AreaJogo areaJogo = new AreaJogo(window,cliente);
 
             String host = defaultIP.split(":")[0];
             int port = Integer.parseInt(defaultIP.split(":")[1]);
@@ -91,8 +90,9 @@ public class Controlador {
             cliente.sendInput(new Mensagem(ultimoIdJogo));
             cliente.sendInput(ultimoJogadorSelecionado);
 
-            window.hideMenu();
+            AreaJogo areaJogo = new AreaJogo(window,cliente);
 
+            window.hideMenu();
             window.setAreaJogo(areaJogo);
             window.showAreaJogo();
             window.addKeyListener(new Controlador.JogoKeyAdapter());
