@@ -157,11 +157,11 @@ public class BNJogador implements Runnable {
 
                 if(bnJogoDisponivel == null){
                     criarNovoJogo();
-                    writeInput(Validacao.WAITING_INPUT);
+                    //writeInput(Validacao.WAITING_INPUT);
                 }else{
                     this.bnJogo = bnJogoDisponivel;
                     bnJogoDisponivel.addJogador(this);
-                    writeInput(Validacao.WAITING_INPUT);
+                    //writeInput(Validacao.WAITING_INPUT);
                 }
 
                 break;

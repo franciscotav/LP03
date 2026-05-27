@@ -60,6 +60,10 @@ public class Servidor{
 
     public BNJogo getBNJogoDisponivel(){
         for(BNJogo bnJogo : bnJogos){
+            String[] id = bnJogo.getJogoId().split("_");
+            if(id[id.length-1].equals("carregado"))
+                continue;
+
             if(bnJogo.esperaJogador()){
                 return bnJogo;
             }
