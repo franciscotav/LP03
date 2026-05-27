@@ -152,6 +152,19 @@ public class BNJogo{
         }
     }
 
+    public void atulizarView(){
+        if(jogadorA != null){
+            jogadorA.writeInput(jogadorATabuleiroBarcos);
+            jogadorA.writeInput(jogadorATabuleiroTiros);
+        }
+
+        if(jogadorB != null){
+            jogadorB.writeInput(jogadorBTabuleiroBarcos);
+            jogadorB.writeInput(jogadorBTabuleiroTiros);
+        }
+
+    }
+
     public synchronized void addTabuleiro(BNJogador bnJogador, Tabuleiro tabuleiroBarcos){
         if(bnJogador == jogadorA){
             jogadorATabuleiroBarcos = tabuleiroBarcos;

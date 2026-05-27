@@ -4,6 +4,7 @@ import batalha.naval.cliente.Cliente;
 import batalha.naval.swing.AreaJogo;
 import batalha.naval.swing.Window;
 import library.payload.comunicacao.EstadosMenu;
+import library.payload.comunicacao.Mensagem;
 
 import javax.swing.*;
 import java.awt.event.KeyAdapter;
@@ -15,6 +16,8 @@ public class Controlador {
     private Window window;
     private Cliente cliente;
     private String defaultIP;
+    private String ultimoIdJogo;
+    private boolean ultimoJogadorSelecionado;
 
     public Controlador(){
         window = new Window();
@@ -25,6 +28,7 @@ public class Controlador {
 
     private void init(){
         window.setNovoJogoButton(new NovoJogoMouseAdapter());
+        window.setCarregarJogoButton(new CarregarJogoButton());
     }
 
     private class NovoJogoMouseAdapter implements MouseListener {
@@ -72,6 +76,53 @@ public class Controlador {
 
     }
 
+    private class CarregarJogoButton implements MouseListener{
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if(!enterServerInformationCarregarJogo()) return;
+            AreaJogo areaJogo = new AreaJogo(window,cliente);
+
+            String host = defaultIP.split(":")[0];
+            int port = Integer.parseInt(defaultIP.split(":")[1]);
+            cliente = new Cliente(host,port, window);
+
+            cliente.sendInput(EstadosMenu.CARREGAR_JOGO);
+            cliente.sendInput(new Mensagem(ultimoIdJogo));
+            cliente.sendInput(ultimoJogadorSelecionado);
+
+            window.hideMenu();
+
+            window.setAreaJogo(areaJogo);
+            window.showAreaJogo();
+            window.addKeyListener(new Controlador.JogoKeyAdapter());
+
+            LogicaJogo logicaJogo = new LogicaJogo(window,cliente);
+            Thread logicaJogothread = new Thread(logicaJogo);
+            logicaJogothread.start();
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+
+        }
+    }
+
 
     private boolean enterServerInformation(){
         JPanel jPanel = new JPanel();
@@ -88,6 +139,51 @@ public class Controlador {
         }
 
         return false;
+    }
+
+    private boolean enterServerInformationCarregarJogo(){
+        JPanel jPanel = new JPanel();
+        jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.Y_AXIS));
+        JTextField fieldTitulo = new JTextField(defaultIP);
+        JLabel labelIdjogo = new JLabel("Insire ID do jogo: ");
+        JTextField fieldIdJogo = new JTextField();
+
+        JRadioButton botaoA = new JRadioButton("Jogador A");
+        JRadioButton botaoB = new JRadioButton("Jogador B");
+
+        ButtonGroup botoesGrupo = new ButtonGroup();
+        botoesGrupo.add(botaoA);
+        botoesGrupo.add(botaoB);
+
+        jPanel.add(fieldTitulo);
+        jPanel.add(labelIdjogo);
+        jPanel.add(fieldIdJogo);
+        jPanel.add(botaoA);
+        jPanel.add(botaoB);
+
+        int result = JOptionPane.showConfirmDialog(window, jPanel,
+                "Carregar Jogo", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if(result == JOptionPane.OK_OPTION){
+            ultimoIdJogo=fieldIdJogo.getText();
+            defaultIP = fieldTitulo.getText();
+            if(botaoB.isSelected()){
+                ultimoJogadorSelecionado = true;
+            }else{
+                ultimoJogadorSelecionado = false;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    public String getUltimoIdJogo(){
+        return ultimoIdJogo;
+    }
+
+    public boolean getUltimoJogadorSelecionado(){
+        return ultimoJogadorSelecionado;
     }
 
     private class JogoKeyAdapter extends KeyAdapter {

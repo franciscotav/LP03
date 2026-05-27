@@ -93,6 +93,27 @@ public class BNJogador implements Runnable {
         writeInput(Validacao.ERROR);
     }
 
+    public void lerDadosCarregar(){
+        try{
+            Mensagem jogoID = (Mensagem) objectInputStream.readObject();
+            boolean jogadorA = (boolean) objectInputStream.readObject();
+            criarNovoJogo();
+
+            bnJogo.carregarJogo(jogoID.getMensagem(), jogadorA);
+            bnJogo.atulizarView();
+        }catch(SocketException e){
+            System.out.println("Ligação perdida com jogador PlayerID: " + playerId);
+            running = false;
+        }catch (IOException e) {
+            e.printStackTrace();
+        }catch(ClassNotFoundException e){
+            e.printStackTrace();
+        }
+
+
+        writeInput(Validacao.ERROR);
+    }
+
     public void writeInput(Object output){
         try{
             objectOutputStream.reset();
@@ -122,6 +143,7 @@ public class BNJogador implements Runnable {
 
                 break;
             case CARREGAR_JOGO:
+                lerDadosCarregar();
                 break;
             case GUARDAR:
                 guardarJogo();

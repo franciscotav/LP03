@@ -27,6 +27,10 @@ public class Window extends JFrame {
         menu.setNovoJogoButton(e);
     }
 
+    public void setCarregarJogoButton(MouseListener e){
+        menu.setCarregarJogoButton(e);
+    }
+
     public void windowUpdate(){
         revalidate();
         repaint();
