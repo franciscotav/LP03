@@ -29,6 +29,15 @@ public class AreaJogo extends JPanel{
     private Barco barcoSetup;
     private Orientacao orientacaoSetup;
 
+    private int currentShipIndex = 0;
+    private final Barco[] shipSequence = {
+            new BarcoPortaAvioes(), // 1x5
+            new BarcoVeleiro(),      // 1x4
+            new BarcoSubmarino(), new BarcoSubmarino(), // 2x3
+            new BarcoLancha(), new BarcoLancha(), new BarcoLancha(), // 3x2
+            new BarcoBote(), new BarcoBote(), new BarcoBote(), new BarcoBote() // 4x1
+    };
+
     public AreaJogo(Window window, Cliente cliente){
             this.window = window;
             this.cliente = cliente;
@@ -60,7 +69,8 @@ public class AreaJogo extends JPanel{
             yPosicaoSetup = 4;
             orientacaoSetup = Orientacao.SUL;
             areaJogadorSetup = true;
-            barcoSetup = new BarcoBote();
+            currentShipIndex = 0;
+            barcoSetup = shipSequence[currentShipIndex];
             areaJogador.moveBarco(xPosicaoSetup,yPosicaoSetup,barcoSetup,orientacaoSetup);
     }
 
@@ -74,15 +84,10 @@ public class AreaJogo extends JPanel{
         orientacaoSetup = Orientacao.SUL;
         areaJogadorSetup = true;
 
-        if(barcoSetup instanceof BarcoBote)
-            barcoSetup = new BarcoLancha();
-        else if(barcoSetup instanceof BarcoLancha)
-            barcoSetup = new BarcoPortaAvioes();
-        else if(barcoSetup instanceof BarcoPortaAvioes)
-            barcoSetup = new BarcoSubmarino();
-        else if(barcoSetup instanceof BarcoSubmarino)
-            barcoSetup = new BarcoVeleiro();
-        else{
+        currentShipIndex++;
+        if(currentShipIndex < shipSequence.length){
+            barcoSetup = shipSequence[currentShipIndex];
+        }else{
             barcoSetup = null;
             areaJogadorSetup = false;
         }

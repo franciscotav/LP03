@@ -134,6 +134,11 @@ public class Servidor {
         public void run() {
             while (true) {
                 verificarTempoEspera();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    break;
+                }
             }
         }
 

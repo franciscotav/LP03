@@ -48,14 +48,15 @@ public class BNJogador implements Runnable {
             running = readInput();
         }
 
-        if (bnJogo != null) {
+        if (bnJogo != null && !desconetado) {
             bnJogo.removerJogador(this);
         }
     }
 
     public void setSocket(Socket socket, ObjectOutputStream out, ObjectInputStream in){
         this.socket = socket;
-        tempoDesconetado = 0;
+        this.desconetado = false;
+        this.tempoDesconetado = 0;
         try {
 
             objectInputStream.close();
@@ -64,6 +65,10 @@ public class BNJogador implements Runnable {
             objectOutputStream = out;
 
             this.writeInput(new Mensagem("Reconetado"));
+            if (bnJogo != null) {
+                bnJogo.atulizarViews();
+                bnJogo.notificarReconexao(this);
+            }
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -75,8 +80,16 @@ public class BNJogador implements Runnable {
     }
 
     public void setDesconetado(Boolean connectado) {
+        if (connectado && !this.desconetado) {
+            tempoDesconetado = System.currentTimeMillis();
+            if (bnJogo != null) {
+                bnJogo.notificarDesconexao(this);
+            }
+        }
         this.desconetado = connectado;
-        if(desconetado) tempoDesconetado = System.currentTimeMillis();
+        if (!connectado) {
+            tempoDesconetado = 0;
+        }
     }
 
     public long getTempoDesconetado(){

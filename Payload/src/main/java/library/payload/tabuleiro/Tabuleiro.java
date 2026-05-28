@@ -209,4 +209,23 @@ public class Tabuleiro implements Serializable {
 
         return false;
     }
+
+    public boolean isBarcoAfundado(int x, int y, EstadosTabuleiro tipoBarco) {
+        return !temParteNaoAtingida(x, y, tipoBarco, new boolean[10][10]);
+    }
+
+    private boolean temParteNaoAtingida(int x, int y, EstadosTabuleiro tipoBarco, boolean[][] visitado) {
+        if (x < 0 || x >= 10 || y < 0 || y >= 10 || visitado[x][y]) return false;
+        visitado[x][y] = true;
+
+        EstadosTabuleiro estado = celulas[x][y];
+        if (estado == tipoBarco) return true;
+        if (estado == EstadosTabuleiro.DANO) {
+            return temParteNaoAtingida(x + 1, y, tipoBarco, visitado) ||
+                   temParteNaoAtingida(x - 1, y, tipoBarco, visitado) ||
+                   temParteNaoAtingida(x, y + 1, tipoBarco, visitado) ||
+                   temParteNaoAtingida(x, y - 1, tipoBarco, visitado);
+        }
+        return false;
+    }
 }

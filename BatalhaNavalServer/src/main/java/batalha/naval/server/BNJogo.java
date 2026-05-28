@@ -139,13 +139,13 @@ public class BNJogo {
 
     public void atulizarViews() {
         if (jogadorA != null) {
-            jogadorA.writeInput(jogadorATabuleiroBarcos);
-            jogadorA.writeInput(jogadorATabuleiroTiros);
+            if (jogadorATabuleiroBarcos != null) jogadorA.writeInput(jogadorATabuleiroBarcos);
+            if (jogadorATabuleiroTiros != null) jogadorA.writeInput(jogadorATabuleiroTiros);
         }
 
         if (jogadorB != null) {
-            jogadorB.writeInput(jogadorBTabuleiroBarcos);
-            jogadorB.writeInput(jogadorBTabuleiroTiros);
+            if (jogadorBTabuleiroBarcos != null) jogadorB.writeInput(jogadorBTabuleiroBarcos);
+            if (jogadorBTabuleiroTiros != null) jogadorB.writeInput(jogadorBTabuleiroTiros);
         }
 
     }
@@ -215,11 +215,11 @@ public class BNJogo {
                     jogadorA.writeInput(jogadorATabuleiroTiros);
                     // jogadorATabuleiroTiros.imprime();
                     jogadorB.writeInput(jogadorBTabuleiroBarcos);
-                    bnJogador.writeInput(new Mensagem("Acertou!"));
-                    jogadorB.writeInput(new Mensagem("Barco atingido!"));
-                    if (!jogadorBTabuleiroBarcos.barcoExiste(estadoTabuleiro)) {
-                        bnJogador.writeInput(new Mensagem(estadoTabuleiro.name() + " destruido!"));
-                        jogadorB.writeInput(new Mensagem(estadoTabuleiro.name() + " afundou!"));
+                    bnJogador.writeInput(new Mensagem("Acertou em " + getNomeBarco(estadoTabuleiro) + "!"));
+                    jogadorB.writeInput(new Mensagem("O teu " + getNomeBarco(estadoTabuleiro) + " foi atingido!"));
+                    if (jogadorBTabuleiroBarcos.isBarcoAfundado(tiro.getX(), tiro.getY(), estadoTabuleiro)) {
+                        bnJogador.writeInput(new Mensagem(getNomeBarco(estadoTabuleiro) + " destruido!"));
+                        jogadorB.writeInput(new Mensagem(getNomeBarco(estadoTabuleiro) + " afundou!"));
                     }
                     if (jogadorBTabuleiroBarcos.semBarcos()) {
                         bnJogador.writeInput(new Mensagem("Vitoria!"));
@@ -259,12 +259,12 @@ public class BNJogo {
                     jogadorB.writeInput(jogadorBTabuleiroTiros);
                     jogadorA.writeInput(jogadorATabuleiroBarcos);
 
-                    bnJogador.writeInput(new Mensagem("Acertou!"));
-                    jogadorA.writeInput(new Mensagem("Barco atingido!"));
+                    bnJogador.writeInput(new Mensagem("Acertou em " + getNomeBarco(estadoTabuleiro) + "!"));
+                    jogadorA.writeInput(new Mensagem("O teu " + getNomeBarco(estadoTabuleiro) + " foi atingido!"));
 
-                    if (!jogadorATabuleiroBarcos.barcoExiste(estadoTabuleiro)) {
-                        bnJogador.writeInput(new Mensagem(estadoTabuleiro.name() + " destruido!"));
-                        jogadorA.writeInput(new Mensagem(estadoTabuleiro.name() + " afundou!"));
+                    if (jogadorATabuleiroBarcos.isBarcoAfundado(tiro.getX(), tiro.getY(), estadoTabuleiro)) {
+                        bnJogador.writeInput(new Mensagem(getNomeBarco(estadoTabuleiro) + " destruido!"));
+                        jogadorA.writeInput(new Mensagem(getNomeBarco(estadoTabuleiro) + " afundou!"));
                     }
                     if (jogadorATabuleiroBarcos.semBarcos()) {
                         bnJogador.writeInput(new Mensagem("Vitoria!"));
@@ -291,6 +291,17 @@ public class BNJogo {
         }
 
         bnJogador.writeInput(new Mensagem("Tiro inválido!"));
+    }
+
+    private String getNomeBarco(EstadosTabuleiro tipo) {
+        switch (tipo) {
+            case BARCO_BOTE: return "Bote";
+            case BARCO_LANCHA: return "Lancha";
+            case BARCO_SUBMARINO: return "Submarino";
+            case BARCO_VELEIRO: return "Veleiro";
+            case BARCO_PORTA_AVIOES: return "Porta-Aviões";
+            default: return "Barco";
+        }
     }
 
     private void aleatorioJogador() {
@@ -340,6 +351,7 @@ public class BNJogo {
     public synchronized void vitoriaPorDesistencia(BNJogador desistente) {
         if (terminou) return;
 
+        System.out.println("JogoID: " + jogoID + " Vitória por desistência. Desistente: " + desistente.getPlayerID());
         BNJogador vencedor = getOponente(desistente);
         if (vencedor != null) {
             vencedor.writeInput(new Mensagem("Vitoria por desistência do oponente!"));
@@ -347,6 +359,10 @@ public class BNJogo {
         }
         terminou = true;
         started = false;
+        
+        // Clean up slots
+        if (jogadorA != null) removerJogador(jogadorA);
+        if (jogadorB != null) removerJogador(jogadorB);
     }
 
     public BNJogador getOponente(BNJogador jogador) {
@@ -357,6 +373,20 @@ public class BNJogo {
 
     public boolean isTerminou() {
         return terminou;
+    }
+
+    public synchronized void notificarReconexao(BNJogador jogador) {
+        BNJogador oponente = getOponente(jogador);
+        if (oponente != null) {
+            oponente.writeInput(EstadosJogo.OPONENTE_CONECTION);
+        }
+    }
+
+    public synchronized void notificarDesconexao(BNJogador jogador) {
+        BNJogador oponente = getOponente(jogador);
+        if (oponente != null) {
+            oponente.writeInput(EstadosJogo.OPONENTE_DISCONETION);
+        }
     }
 
     public synchronized void removerJogador(BNJogador bnJogador) {
