@@ -64,6 +64,9 @@ public class Servidor {
                     if (p.isDesconetado()) {
                         p.setDesconetado(false);
                         p.setSocket(socket, out, in);
+                        
+                        Thread jogadorThread = new Thread(p);
+                        jogadorThread.start();
                     }
                 } else {
                     BNJogador bnJogador = new BNJogador(socket, this, criarPlayerID(), idConecao, out, in);
@@ -138,7 +141,14 @@ public class Servidor {
             long agora = System.currentTimeMillis();
             jogadoresAtivos.entrySet().removeIf(entry -> {
                 BNJogador p = entry.getValue();
-                return p.isDesconetado() && (agora - p.getTempoDesconetado() > tempoEspera);
+                boolean timeout = p.isDesconetado() && (agora - p.getTempoDesconetado() > tempoEspera);
+                if (timeout) {
+                    BNJogo jogo = p.getBnJogo();
+                    if (jogo != null) {
+                        jogo.vitoriaPorDesistencia(p);
+                    }
+                }
+                return timeout;
             });
         }
 

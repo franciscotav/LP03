@@ -28,7 +28,26 @@ public class LogicaJogo implements Runnable {
         while (running) {
             Object input = cliente.readInput();
 
-            if (input == null) break;
+            if (input == null) {
+                if (!running) break;
+                
+                window.appendLog("Conexão perdida. A tentar reconectar...");
+                boolean reconectado = false;
+                while (running && !reconectado) {
+                    reconectado = cliente.reconnect();
+                    if (!reconectado) {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                    }
+                }
+                if (reconectado) {
+                    window.appendLog("Reconectado com sucesso!");
+                }
+                continue;
+            }
 
             if (input instanceof EstadosJogo) {
                 EstadosJogo estadoJogo = (EstadosJogo) input;

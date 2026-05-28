@@ -337,6 +337,28 @@ public class BNJogo {
         return true;
     }
 
+    public synchronized void vitoriaPorDesistencia(BNJogador desistente) {
+        if (terminou) return;
+
+        BNJogador vencedor = getOponente(desistente);
+        if (vencedor != null) {
+            vencedor.writeInput(new Mensagem("Vitoria por desistência do oponente!"));
+            desistente.writeInput(new Mensagem("Derrota por tempo limite excedido!"));
+        }
+        terminou = true;
+        started = false;
+    }
+
+    public BNJogador getOponente(BNJogador jogador) {
+        if (jogador == jogadorA) return jogadorB;
+        if (jogador == jogadorB) return jogadorA;
+        return null;
+    }
+
+    public boolean isTerminou() {
+        return terminou;
+    }
+
     public synchronized void removerJogador(BNJogador bnJogador) {
         if (jogadorA == bnJogador) {
             jogadorA = null;

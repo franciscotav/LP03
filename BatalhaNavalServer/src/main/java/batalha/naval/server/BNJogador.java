@@ -123,12 +123,12 @@ public class BNJogador implements Runnable {
 
         }catch(SocketException e){
             System.out.println("Ligação perdida com jogador PlayerID: " + playerId);
-            running = false;
+            setDesconetado(true);
             return false;
-        }catch (IOException e) {
-            e.printStackTrace();
-        }catch(ClassNotFoundException e){
-            e.printStackTrace();
+        }catch (IOException | ClassNotFoundException e) {
+            // e.printStackTrace();
+            setDesconetado(true);
+            return false;
         }
 
 
@@ -215,6 +215,7 @@ public class BNJogador implements Runnable {
                 guardarJogo();
                 break;
             case QUIT:
+                setDesconetado(true);
                 return false;
         }
 
@@ -234,5 +235,9 @@ public class BNJogador implements Runnable {
 
     public String getPlayerID(){
         return playerId;
+    }
+
+    public BNJogo getBnJogo() {
+        return bnJogo;
     }
 }
