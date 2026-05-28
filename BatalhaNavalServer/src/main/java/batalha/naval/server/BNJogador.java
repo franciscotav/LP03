@@ -22,7 +22,7 @@ public class BNJogador implements Runnable {
     ObjectInputStream objectInputStream;
     ObjectOutputStream objectOutputStream;
 
-    public BNJogador(Socket socket, Servidor servidor, String playerID, String idSessao) {
+    public BNJogador(Socket socket, Servidor servidor, String playerID, String idSessao, ObjectOutputStream out, ObjectInputStream in) {
         this.socket = socket;
         this.servidor = servidor;
         this.playerId = playerID;
@@ -32,13 +32,11 @@ public class BNJogador implements Runnable {
 
         desconetado = false;
         tempoDesconetado = 0;
+        System.out.println("teste");
 
-        try {
-            objectInputStream = new ObjectInputStream(socket.getInputStream());
-            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        objectInputStream = in;
+        objectOutputStream = out;
+
 
         System.out.println("A criar jogador PlayerID: " + playerID);
     }
@@ -53,15 +51,15 @@ public class BNJogador implements Runnable {
         bnJogo.removerJogador(this);
     }
 
-    public void setSocket(Socket socket){
+    public void setSocket(Socket socket, ObjectOutputStream out, ObjectInputStream in){
         this.socket = socket;
         tempoDesconetado = 0;
         try {
+
             objectInputStream.close();
             objectOutputStream.close();
-
-            objectInputStream = new ObjectInputStream(socket.getInputStream());
-            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            objectInputStream = in;
+            objectOutputStream = out;
 
             this.writeInput(new Mensagem("Reconetado"));
         }catch (IOException e){

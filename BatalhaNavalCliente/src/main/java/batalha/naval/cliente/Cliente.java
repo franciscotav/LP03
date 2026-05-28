@@ -19,12 +19,11 @@ public class Cliente {
     private Window window;
     private String ID;
 
-    public Cliente(String host, int port, Window window){
+    public Cliente(String host, int port, Window window, String ID){
         try{
             socket=new Socket(host,port);
-            ID = gerarIdUnico();
+            this.ID = ID;
             objectOuputStream = new ObjectOutputStream(socket.getOutputStream());
-            objectOuputStream.writeObject(new Mensagem(ID));
             objectInputStream = new ObjectInputStream(socket.getInputStream());
             this.window = window;
 
@@ -39,6 +38,7 @@ public class Cliente {
 
     public void sendInput(Object input){
         try{
+            //objectOuputStream.flush();
             objectOuputStream.writeObject(input);
         }catch (IOException e) {
             e.printStackTrace();

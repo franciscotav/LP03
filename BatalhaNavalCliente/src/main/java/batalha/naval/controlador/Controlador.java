@@ -11,6 +11,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.time.LocalDate;
+import java.util.Date;
 
 public class Controlador {
     private Window window;
@@ -18,11 +20,13 @@ public class Controlador {
     private String defaultIP;
     private String ultimoIdJogo;
     private boolean ultimoJogadorSelecionado;
+    private String ID;
 
     public Controlador(){
         window = new Window();
         cliente = null;
         defaultIP = "127.0.0.1:8080";
+        ID = Long.toString(System.nanoTime());
         init();
     }
 
@@ -38,9 +42,11 @@ public class Controlador {
 
             String host = defaultIP.split(":")[0];
             int port = Integer.parseInt(defaultIP.split(":")[1]);
-            cliente = new Cliente(host,port, window);
+            cliente = new Cliente(host,port, window, ID);
 
+            cliente.sendInput(new Mensagem(ID));
             cliente.sendInput(EstadosMenu.NOVO_JOGO);
+
 
             window.hideMenu();
 
@@ -84,8 +90,9 @@ public class Controlador {
 
             String host = defaultIP.split(":")[0];
             int port = Integer.parseInt(defaultIP.split(":")[1]);
-            cliente = new Cliente(host,port, window);
+            cliente = new Cliente(host,port, window, ID);
 
+            cliente.sendInput(new Mensagem(ID));
             cliente.sendInput(EstadosMenu.CARREGAR_JOGO);
             cliente.sendInput(new Mensagem(ultimoIdJogo));
             cliente.sendInput(ultimoJogadorSelecionado);

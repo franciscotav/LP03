@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
 public class Servidor {
@@ -14,7 +15,7 @@ public class Servidor {
     private LinkedBlockingDeque<BNJogo> bnJogos;
     private BNServerSocket bnServerSocket;
 
-    private Map<String, BNJogador> jogadoresAtivos = new HashMap<>();
+    private Map<String, BNJogador> jogadoresAtivos = new ConcurrentHashMap<>();
     private long tempoEspera = 30000; //30 segundos
 
     public Servidor(int porta) {
@@ -39,19 +40,34 @@ public class Servidor {
         while (true) {
             try {
                 Socket socket = bnServerSocket.clients().take();
-                String idConecao = lerIDConecaoSocket(socket);
+                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                out.flush();
+                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+
+                Object input = in.readObject();
+
+                if (!(input instanceof Mensagem)) {
+                    continue;
+                }
+
+                Mensagem mensagem = (Mensagem) input;
+                String idConecao = mensagem.getMensagem();
+
+                if (idConecao == null) {
+                    continue;
+                }
+
+                System.out.println("Connection ID: " + idConecao);
 
                 if (jogadoresAtivos.containsKey(idConecao)) {
                     BNJogador p = jogadoresAtivos.get(idConecao);
                     if (p.isDesconetado()) {
                         p.setDesconetado(false);
-                        p.setSocket(socket);
+                        p.setSocket(socket, out, in);
                     }
                 } else {
-                    BNJogador bnJogador = new BNJogador(socket, this, criarPlayerID(), idConecao);
-                    if (idConecao != null) {
-                        jogadoresAtivos.put(idConecao, bnJogador);
-                    }
+                    BNJogador bnJogador = new BNJogador(socket, this, criarPlayerID(), idConecao, out, in);
+                    jogadoresAtivos.put(idConecao, bnJogador);
 
                     Thread jogadorThread = new Thread(bnJogador);
                     jogadorThread.start();
@@ -60,25 +76,14 @@ public class Servidor {
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 break;
+            } catch (IOException e) {
+                e.printStackTrace();
+                break;
+            }catch(ClassNotFoundException e){
+                e.printStackTrace();
+                break;
             }
         }
-    }
-
-    private String lerIDConecaoSocket(Socket socket) {
-        try {
-            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-            Mensagem mensagem = (Mensagem) objectInputStream.readObject();
-            objectInputStream.close();
-
-            return mensagem.toString();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
     public LinkedBlockingDeque<BNJogo> getBNJogos() {
@@ -131,12 +136,10 @@ public class Servidor {
 
         public void verificarTempoEspera() {
             long agora = System.currentTimeMillis();
-            for (BNJogador p : jogadoresAtivos.values()) {
-                if (p.isDesconetado() && (agora - p.getTempoDesconetado() > tempoEspera)) {
-                    //perdaDeJogador(p);
-                    jogadoresAtivos.remove(p.getIdSessao());
-                }
-            }
+            jogadoresAtivos.entrySet().removeIf(entry -> {
+                BNJogador p = entry.getValue();
+                return p.isDesconetado() && (agora - p.getTempoDesconetado() > tempoEspera);
+            });
         }
 
     }

@@ -433,6 +433,8 @@ class Dados implements Serializable{
             ObjectInputStream inObj = new ObjectInputStream(in);
             Dados dados = (Dados) inObj.readObject();
 
+            inObj.close();
+
             System.out.println("Carregou Jogo: " + path);
             return dados;
 
