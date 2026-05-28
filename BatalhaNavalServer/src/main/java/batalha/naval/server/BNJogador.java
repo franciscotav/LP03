@@ -48,7 +48,9 @@ public class BNJogador implements Runnable {
             running = readInput();
         }
 
-        bnJogo.removerJogador(this);
+        if (bnJogo != null) {
+            bnJogo.removerJogador(this);
+        }
     }
 
     public void setSocket(Socket socket, ObjectOutputStream out, ObjectInputStream in){

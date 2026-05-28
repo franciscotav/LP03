@@ -30,6 +30,13 @@ public class Window extends JFrame {
     public void setCarregarJogoButton(MouseListener e){
         menu.setCarregarJogoButton(e);
     }
+    public void setSairButton(MouseListener e){
+        menu.setSairButton(e);
+    }
+
+    public void setDesconectarButton(MouseListener e){
+        areaJogo.setDesconectarButton(e);
+    }
 
     public void windowUpdate(){
         revalidate();

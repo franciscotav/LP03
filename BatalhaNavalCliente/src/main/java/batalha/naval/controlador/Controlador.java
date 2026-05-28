@@ -21,6 +21,7 @@ public class Controlador {
     private String ultimoIdJogo;
     private boolean ultimoJogadorSelecionado;
     private String ID;
+    private LogicaJogo logicaJogo;
 
     public Controlador(){
         window = new Window();
@@ -33,6 +34,44 @@ public class Controlador {
     private void init(){
         window.setNovoJogoButton(new NovoJogoMouseAdapter());
         window.setCarregarJogoButton(new CarregarJogoButton());
+        window.setSairButton(new SairButton());
+    }
+
+    private class SairButton implements MouseListener {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            System.exit(0);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {}
+        @Override
+        public void mouseReleased(MouseEvent e) {}
+        @Override
+        public void mouseEntered(MouseEvent e) {}
+        @Override
+        public void mouseExited(MouseEvent e) {}
+    }
+
+    private class DesconectarButton implements MouseListener {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (logicaJogo != null) {
+                logicaJogo.stop();
+            }
+            cliente.sendInput(EstadosMenu.QUIT);
+            window.hideAreaJogo();
+            window.showMenu();
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {}
+        @Override
+        public void mouseReleased(MouseEvent e) {}
+        @Override
+        public void mouseEntered(MouseEvent e) {}
+        @Override
+        public void mouseExited(MouseEvent e) {}
     }
 
     private class NovoJogoMouseAdapter implements MouseListener {
@@ -53,9 +92,10 @@ public class Controlador {
             AreaJogo areaJogo = new AreaJogo(window,cliente);
             window.setAreaJogo(areaJogo);
             window.showAreaJogo();
+            window.setDesconectarButton(new DesconectarButton());
             window.addKeyListener(new Controlador.JogoKeyAdapter());
 
-            LogicaJogo logicaJogo = new LogicaJogo(window,cliente);
+            logicaJogo = new LogicaJogo(window,cliente);
             Thread logicaJogothread = new Thread(logicaJogo);
             logicaJogothread.start();
         }
@@ -102,9 +142,10 @@ public class Controlador {
             window.hideMenu();
             window.setAreaJogo(areaJogo);
             window.showAreaJogo();
+            window.setDesconectarButton(new DesconectarButton());
             window.addKeyListener(new Controlador.JogoKeyAdapter());
 
-            LogicaJogo logicaJogo = new LogicaJogo(window,cliente);
+            logicaJogo = new LogicaJogo(window,cliente);
             Thread logicaJogothread = new Thread(logicaJogo);
             logicaJogothread.start();
         }

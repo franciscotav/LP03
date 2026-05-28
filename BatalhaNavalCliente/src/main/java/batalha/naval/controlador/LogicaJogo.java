@@ -13,15 +13,22 @@ import java.awt.event.KeyListener;
 public class LogicaJogo implements Runnable {
     private Window window;
     private Cliente cliente;
+    private volatile boolean running = true;
 
     public LogicaJogo(Window window, Cliente cliente) {
         this.window = window;
         this.cliente = cliente;
     }
 
+    public void stop() {
+        running = false;
+    }
+
     public void run() {
-        while (true) {
+        while (running) {
             Object input = cliente.readInput();
+
+            if (input == null) break;
 
             if (input instanceof EstadosJogo) {
                 EstadosJogo estadoJogo = (EstadosJogo) input;

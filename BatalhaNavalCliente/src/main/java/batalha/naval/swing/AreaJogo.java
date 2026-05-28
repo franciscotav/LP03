@@ -188,6 +188,10 @@ public class AreaJogo extends JPanel{
         window.windowUpdate();
     }
 
+    public void setDesconectarButton(MouseListener e){
+        areaMenu.setDesconectarButton(e);
+    }
+
 }
 
 class AreaMenu extends JPanel{
