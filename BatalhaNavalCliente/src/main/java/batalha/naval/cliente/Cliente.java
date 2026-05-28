@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.time.LocalDate;
 
 
 public class Cliente {
@@ -16,17 +17,24 @@ public class Cliente {
     private ObjectOutputStream objectOuputStream;
     private ObjectInputStream objectInputStream;
     private Window window;
+    private String ID;
 
     public Cliente(String host, int port, Window window){
         try{
             socket=new Socket(host,port);
+            ID = gerarIdUnico();
             objectOuputStream = new ObjectOutputStream(socket.getOutputStream());
+            objectOuputStream.writeObject(new Mensagem(ID));
             objectInputStream = new ObjectInputStream(socket.getInputStream());
             this.window = window;
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static String gerarIdUnico(){
+        return LocalDate.now().toString();
     }
 
     public void sendInput(Object input){

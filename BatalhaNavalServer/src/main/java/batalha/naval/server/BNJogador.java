@@ -15,15 +15,23 @@ public class BNJogador implements Runnable {
     private boolean running;
     private BNJogo bnJogo;
 
+    private String idSessao;
+    private boolean desconetado;
+    private long tempoDesconetado;
+
     ObjectInputStream objectInputStream;
     ObjectOutputStream objectOutputStream;
 
-    public BNJogador(Socket socket, Servidor servidor, String playerID) {
+    public BNJogador(Socket socket, Servidor servidor, String playerID, String idSessao) {
         this.socket = socket;
         this.servidor = servidor;
         this.playerId = playerID;
         this.running = false;
         this.bnJogo = null;
+        this.idSessao = idSessao;
+
+        desconetado = false;
+        tempoDesconetado = 0;
 
         try {
             objectInputStream = new ObjectInputStream(socket.getInputStream());
@@ -45,6 +53,39 @@ public class BNJogador implements Runnable {
         bnJogo.removerJogador(this);
     }
 
+    public void setSocket(Socket socket){
+        this.socket = socket;
+        tempoDesconetado = 0;
+        try {
+            objectInputStream.close();
+            objectOutputStream.close();
+
+            objectInputStream = new ObjectInputStream(socket.getInputStream());
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+
+            this.writeInput(new Mensagem("Reconetado"));
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public boolean isDesconetado() {
+        return desconetado;
+    }
+
+    public void setDesconetado(Boolean connectado) {
+        this.desconetado = connectado;
+        if(desconetado) tempoDesconetado = System.currentTimeMillis();
+    }
+
+    public long getTempoDesconetado(){
+        return tempoDesconetado;
+    }
+
+    public String getIdSessao(){
+        return idSessao;
+    }
 
     public boolean readInput(){
         try{
@@ -83,6 +124,7 @@ public class BNJogador implements Runnable {
         }catch(SocketException e){
             System.out.println("Ligação perdida com jogador PlayerID: " + playerId);
             running = false;
+            return false;
         }catch (IOException e) {
             e.printStackTrace();
         }catch(ClassNotFoundException e){
@@ -146,6 +188,7 @@ public class BNJogador implements Runnable {
             running = false;
         }
         catch (IOException e) {
+            setDesconetado(true);
             e.printStackTrace();
         }
     }
